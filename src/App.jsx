@@ -11,6 +11,13 @@ function App() {
   const [swipeDirection, setSwipeDirection] = useState("");
   const [profileKey, setProfileKey] = useState(0);
 
+  const [currentScreen, setCurrentScreen] = useState("main");
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [chatInput, setChatInput] = useState("");
+
+  const [matches, setMatches] = useState([]);
+  const [messages, setMessages] = useState({});
+
   const datingProfile = useMemo(() => {
     const names = [
       "Alex",
@@ -65,6 +72,7 @@ function App() {
     )}`;
 
     return {
+      id: seed,
       name: randomName,
       bio: randomBio,
       food: randomFood,
@@ -134,6 +142,23 @@ function App() {
     setSwipeDirection("");
   }
 
+  function openChat(profile) {
+    setSelectedChat(profile);
+    setCurrentScreen("chat");
+
+    if (!messages[profile.id]) {
+      setMessages((prev) => ({
+        ...prev,
+        [profile.id]: [
+          {
+            sender: "them",
+            text: `Hey! I saw we both like ${profile.food}.`,
+          },
+        ],
+      }));
+    }
+  }
+
   function handleDislike() {
     setMatchMessage("Not a match");
     setSwipeDirection("left");
@@ -141,7 +166,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 1800);
   }
 
   function handleLike() {
@@ -151,6 +176,25 @@ function App() {
     if (gotMatch) {
       setMatchCount((prev) => prev + 1);
       setMatchMessage(`It's a match with ${datingProfile.name}!`);
+
+      setMatches((prev) => {
+        const alreadyExists = prev.some((item) => item.id === datingProfile.id);
+        if (alreadyExists) return prev;
+        return [...prev, datingProfile];
+      });
+
+      setMessages((prev) => {
+        if (prev[datingProfile.id]) return prev;
+        return {
+          ...prev,
+          [datingProfile.id]: [
+            {
+              sender: "them",
+              text: `Hi! I also love ${datingProfile.food}.`,
+            },
+          ],
+        };
+      });
     } else {
       setMatchMessage("Liked! No match this time.");
     }
@@ -158,7 +202,21 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 1800);
+  }
+
+  function handleSendMessage() {
+    if (!chatInput.trim() || !selectedChat) return;
+
+    setMessages((prev) => ({
+      ...prev,
+      [selectedChat.id]: [
+        ...(prev[selectedChat.id] || []),
+        { sender: "me", text: chatInput },
+      ],
+    }));
+
+    setChatInput("");
   }
 
   const datingCardTransform =
@@ -168,7 +226,411 @@ function App() {
       ? "translateX(180px) rotate(12deg)"
       : "translateX(0) rotate(0deg)";
 
+  function renderTopRightIcons() {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          top: "18px",
+          right: "18px",
+          zIndex: 5,
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <button
+          onClick={() => setCurrentScreen("matches")}
+          style={{
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            position: "relative",
+            fontSize: "26px",
+          }}
+        >
+          💙
+          <span
+            style={{
+              position: "absolute",
+              top: "-5px",
+              right: "-10px",
+              minWidth: "20px",
+              height: "20px",
+              borderRadius: "50%",
+              backgroundColor: "#2f7fb5",
+              color: "white",
+              fontSize: "11px",
+              fontWeight: "700",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 4px",
+            }}
+          >
+            {matchCount}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setCurrentScreen("messages")}
+          style={{
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            position: "relative",
+            fontSize: "24px",
+          }}
+        >
+          💬
+        </button>
+      </div>
+    );
+  }
+
+  function renderMatchesScreen() {
+    return (
+      <>
+        <h1
+          style={{
+            fontSize: "36px",
+            color: "#1f5f8b",
+            marginBottom: "8px",
+            fontWeight: "700",
+            marginTop: "10px",
+          }}
+        >
+          Your Matches
+        </h1>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#24506d",
+            marginBottom: "22px",
+          }}
+        >
+          Tap a profile to start chatting.
+        </p>
+
+        {matches.length === 0 ? (
+          <p style={{ color: "#1f5f8b", marginTop: "60px" }}>
+            No matches yet.
+          </p>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+              paddingBottom: "20px",
+            }}
+          >
+            {matches.map((match) => (
+              <button
+                key={match.id}
+                onClick={() => openChat(match)}
+                style={{
+                  backgroundColor: "white",
+                  border: "none",
+                  borderRadius: "18px",
+                  padding: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  cursor: "pointer",
+                  boxShadow: "0 6px 14px rgba(0,0,0,0.08)",
+                  textAlign: "left",
+                }}
+              >
+                <img
+                  src={match.avatarUrl}
+                  alt={match.name}
+                  style={{
+                    width: "58px",
+                    height: "58px",
+                    borderRadius: "50%",
+                    backgroundColor: "#dff2ff",
+                  }}
+                />
+                <div>
+                  <p
+                    style={{
+                      margin: "0 0 4px 0",
+                      color: "#1f5f8b",
+                      fontWeight: "700",
+                      fontSize: "18px",
+                    }}
+                  >
+                    {match.name}
+                  </p>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#335c74",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Loves {match.food}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  }
+
+  function renderMessagesScreen() {
+    return (
+      <>
+        <h1
+          style={{
+            fontSize: "36px",
+            color: "#1f5f8b",
+            marginBottom: "8px",
+            fontWeight: "700",
+            marginTop: "10px",
+          }}
+        >
+          Messages
+        </h1>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#24506d",
+            marginBottom: "22px",
+          }}
+        >
+          Open a conversation with your matches.
+        </p>
+
+        {matches.length === 0 ? (
+          <p style={{ color: "#1f5f8b", marginTop: "60px" }}>
+            No messages yet.
+          </p>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+              paddingBottom: "20px",
+            }}
+          >
+            {matches.map((match) => {
+              const lastMessage =
+                messages[match.id]?.[messages[match.id].length - 1]?.text || "";
+              return (
+                <button
+                  key={match.id}
+                  onClick={() => openChat(match)}
+                  style={{
+                    backgroundColor: "white",
+                    border: "none",
+                    borderRadius: "18px",
+                    padding: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "14px",
+                    cursor: "pointer",
+                    boxShadow: "0 6px 14px rgba(0,0,0,0.08)",
+                    textAlign: "left",
+                  }}
+                >
+                  <img
+                    src={match.avatarUrl}
+                    alt={match.name}
+                    style={{
+                      width: "58px",
+                      height: "58px",
+                      borderRadius: "50%",
+                      backgroundColor: "#dff2ff",
+                    }}
+                  />
+                  <div style={{ overflow: "hidden" }}>
+                    <p
+                      style={{
+                        margin: "0 0 4px 0",
+                        color: "#1f5f8b",
+                        fontWeight: "700",
+                        fontSize: "18px",
+                      }}
+                    >
+                      {match.name}
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "#335c74",
+                        fontSize: "13px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "180px",
+                      }}
+                    >
+                      {lastMessage}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </>
+    );
+  }
+
+  function renderChatScreen() {
+    const chatMessages = selectedChat ? messages[selectedChat.id] || [] : [];
+
+    return (
+      <>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginTop: "8px",
+            marginBottom: "16px",
+          }}
+        >
+          <button
+            onClick={() => setCurrentScreen("messages")}
+            style={{
+              border: "none",
+              background: "transparent",
+              fontSize: "22px",
+              cursor: "pointer",
+              color: "#1f5f8b",
+            }}
+          >
+            ←
+          </button>
+
+          {selectedChat && (
+            <>
+              <img
+                src={selectedChat.avatarUrl}
+                alt={selectedChat.name}
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "50%",
+                  backgroundColor: "#dff2ff",
+                }}
+              />
+              <div style={{ textAlign: "left" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#1f5f8b",
+                    fontWeight: "700",
+                    fontSize: "18px",
+                  }}
+                >
+                  {selectedChat.name}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#335c74",
+                    fontSize: "13px",
+                  }}
+                >
+                  Favourite food: {selectedChat.food}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "20px",
+            padding: "16px",
+            minHeight: "340px",
+            boxShadow: "0 6px 14px rgba(0,0,0,0.08)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          {chatMessages.map((msg, index) => (
+            <div
+              key={index}
+              style={{
+                alignSelf: msg.sender === "me" ? "flex-end" : "flex-start",
+                backgroundColor: msg.sender === "me" ? "#4da8da" : "#e8f5fc",
+                color: msg.sender === "me" ? "white" : "#1f5f8b",
+                padding: "10px 14px",
+                borderRadius: "16px",
+                maxWidth: "80%",
+                fontSize: "14px",
+              }}
+            >
+              {msg.text}
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            marginTop: "16px",
+            display: "flex",
+            gap: "10px",
+          }}
+        >
+          <input
+            type="text"
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            placeholder="Type a message..."
+            style={{
+              flex: 1,
+              padding: "12px",
+              borderRadius: "14px",
+              border: "none",
+              outline: "none",
+              fontSize: "14px",
+            }}
+          />
+          <button
+            onClick={handleSendMessage}
+            style={{
+              backgroundColor: "#4da8da",
+              color: "white",
+              border: "none",
+              borderRadius: "14px",
+              padding: "12px 16px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Send
+          </button>
+        </div>
+      </>
+    );
+  }
+
   function renderContent() {
+    if (currentScreen === "matches") {
+      return renderMatchesScreen();
+    }
+
+    if (currentScreen === "messages") {
+      return renderMessagesScreen();
+    }
+
+    if (currentScreen === "chat") {
+      return renderChatScreen();
+    }
+
     if (activeTab === "decide") {
       return (
         <>
@@ -271,37 +733,6 @@ function App() {
     if (activeTab === "dating") {
       return (
         <>
-          <div
-            style={{
-              position: "absolute",
-              top: "18px",
-              right: "22px",
-              zIndex: 4,
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            <span style={{ fontSize: "28px" }}>💙</span>
-            <div
-              style={{
-                minWidth: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                backgroundColor: "#2f7fb5",
-                color: "white",
-                fontSize: "13px",
-                fontWeight: "700",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "0 6px",
-              }}
-            >
-              {matchCount}
-            </div>
-          </div>
-
           <div
             style={{
               width: "100%",
@@ -631,6 +1062,8 @@ function App() {
             }}
           />
 
+          {renderTopRightIcons()}
+
           <div
             style={{
               height: "100%",
@@ -663,7 +1096,10 @@ function App() {
             }}
           >
             <button
-              onClick={() => setActiveTab("decide")}
+              onClick={() => {
+                setActiveTab("decide");
+                setCurrentScreen("main");
+              }}
               onMouseEnter={() => setHovered("nav-decide")}
               onMouseLeave={() => setHovered(null)}
               style={navButtonStyle("decide")}
@@ -672,7 +1108,10 @@ function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab("dating")}
+              onClick={() => {
+                setActiveTab("dating");
+                setCurrentScreen("main");
+              }}
               onMouseEnter={() => setHovered("nav-dating")}
               onMouseLeave={() => setHovered(null)}
               style={navButtonStyle("dating")}
@@ -681,7 +1120,10 @@ function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab("profile")}
+              onClick={() => {
+                setActiveTab("profile");
+                setCurrentScreen("main");
+              }}
               onMouseEnter={() => setHovered("nav-profile")}
               onMouseLeave={() => setHovered(null)}
               style={navButtonStyle("profile")}
