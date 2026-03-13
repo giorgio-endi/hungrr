@@ -1,8 +1,21 @@
 import { useState } from "react";
 
 function App() {
-  const [createHover, setCreateHover] = useState(false);
-  const [joinHover, setJoinHover] = useState(false);
+  const [hovered, setHovered] = useState(null);
+
+  const buttonStyle = (name) => ({
+    width: "250px",
+    padding: "18px",
+    fontSize: "22px",
+    borderRadius: "16px",
+    border: "none",
+    backgroundColor: hovered === name ? "#2f7fb5" : "#4da8da",
+    color: "white",
+    cursor: "pointer",
+    marginTop: "18px",
+    fontWeight: "600",
+    transition: "0.25s",
+  });
 
   return (
     <div
@@ -18,19 +31,22 @@ function App() {
       <div
         style={{
           backgroundColor: "#f7f7f7",
-          padding: "60px 70px",
+          padding: "60px",
           borderRadius: "30px",
           textAlign: "center",
-          width: "500px",
-          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.08)",
+          width: "420px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <h1
           style={{
             fontSize: "64px",
             color: "#2f6f9e",
-            margin: "0 0 28px 0",
-            fontWeight: "700",
+            marginBottom: "25px",
+            marginTop: "0",
             letterSpacing: "1px",
           }}
         >
@@ -39,53 +55,27 @@ function App() {
 
         <p
           style={{
-            fontSize: "28px",
+            fontSize: "26px",
             color: "#34495e",
-            marginBottom: "45px",
+            marginBottom: "35px",
             marginTop: "0",
-            fontWeight: "500",
           }}
         >
           What are you in the mood for?
         </p>
 
         <button
-          onMouseEnter={() => setCreateHover(true)}
-          onMouseLeave={() => setCreateHover(false)}
-          style={{
-            width: "250px",
-            padding: "18px",
-            fontSize: "22px",
-            borderRadius: "16px",
-            border: "none",
-            backgroundColor: createHover ? "#2f7fb5" : "#4da8da",
-            color: "white",
-            cursor: "pointer",
-            marginBottom: "20px",
-            fontWeight: "600",
-            transition: "0.25s",
-          }}
+          onMouseEnter={() => setHovered("create")}
+          onMouseLeave={() => setHovered(null)}
+          style={buttonStyle("create")}
         >
           Create Room
         </button>
 
-        <br />
-
         <button
-          onMouseEnter={() => setJoinHover(true)}
-          onMouseLeave={() => setJoinHover(false)}
-          style={{
-            width: "250px",
-            padding: "18px",
-            fontSize: "22px",
-            borderRadius: "16px",
-            border: "2px solid #4da8da",
-            backgroundColor: joinHover ? "#4da8da" : "white",
-            color: joinHover ? "white" : "#2f6f9e",
-            cursor: "pointer",
-            fontWeight: "600",
-            transition: "0.25s",
-          }}
+          onMouseEnter={() => setHovered("join")}
+          onMouseLeave={() => setHovered(null)}
+          style={buttonStyle("join")}
         >
           Join Room
         </button>
