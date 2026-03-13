@@ -141,7 +141,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 450);
+    }, 1800);
   }
 
   function handleLike() {
@@ -158,7 +158,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 450);
+    }, 1800);
   }
 
   const datingCardTransform =
