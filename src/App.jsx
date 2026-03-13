@@ -166,7 +166,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 1800);
+    }, 800);
   }
 
   function handleLike() {
@@ -202,7 +202,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 1800);
+    }, 800);
   }
 
   function handleSendMessage() {
