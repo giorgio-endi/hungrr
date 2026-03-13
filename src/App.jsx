@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { createRoom } from "./firestore";
 
 function App() {
   const [hovered, setHovered] = useState(null);
+  const [roomCode, setRoomCode] = useState("");
 
   const buttonStyle = (name) => ({
     width: "250px",
@@ -16,6 +18,29 @@ function App() {
     fontWeight: "600",
     transition: "0.25s",
   });
+
+  function generateRoomCode() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+
+    for (let i = 0; i < 4; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      code += chars[randomIndex];
+    }
+
+    return code;
+  }
+
+  async function handleCreateRoom() {
+    try {
+      const code = generateRoomCode();
+      await createRoom(code);
+      setRoomCode(code);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
+  }
 
   return (
     <div
@@ -65,6 +90,7 @@ function App() {
         </p>
 
         <button
+          onClick={handleCreateRoom}
           onMouseEnter={() => setHovered("create")}
           onMouseLeave={() => setHovered(null)}
           style={buttonStyle("create")}
@@ -79,6 +105,12 @@ function App() {
         >
           Join Room
         </button>
+
+        {roomCode !== "" && (
+          <p style={{ marginTop: "24px", fontSize: "20px", color: "#2f6f9e" }}>
+            Room Code: {roomCode}
+          </p>
+        )}
       </div>
     </div>
   );
