@@ -6,6 +6,10 @@ function App() {
   const [roomCode, setRoomCode] = useState("");
   const [activeTab, setActiveTab] = useState("decide");
   const [profileHover, setProfileHover] = useState(null);
+  const [matchCount, setMatchCount] = useState(0);
+  const [matchMessage, setMatchMessage] = useState("");
+  const [swipeDirection, setSwipeDirection] = useState("");
+  const [profileKey, setProfileKey] = useState(0);
 
   const datingProfile = useMemo(() => {
     const names = [
@@ -53,7 +57,9 @@ function App() {
       favouriteFoods[Math.floor(Math.random() * favouriteFoods.length)];
     const randomMood = moods[Math.floor(Math.random() * moods.length)];
 
-    const seed = `${randomName}-${randomFood}-${Math.floor(Math.random() * 10000)}`;
+    const seed = `${randomName}-${randomFood}-${profileKey}-${Math.floor(
+      Math.random() * 10000
+    )}`;
     const avatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(
       seed
     )}`;
@@ -65,7 +71,7 @@ function App() {
       mood: randomMood,
       avatarUrl,
     };
-  }, []);
+  }, [profileKey]);
 
   const mainButtonStyle = (name) => ({
     width: "250px",
@@ -122,6 +128,45 @@ function App() {
       alert("Something went wrong");
     }
   }
+
+  function loadNextDatingProfile() {
+    setProfileKey((prev) => prev + 1);
+    setSwipeDirection("");
+  }
+
+  function handleDislike() {
+    setMatchMessage("Not a match");
+    setSwipeDirection("left");
+
+    setTimeout(() => {
+      loadNextDatingProfile();
+      setMatchMessage("");
+    }, 450);
+  }
+
+  function handleLike() {
+    const gotMatch = Math.random() < 0.4;
+    setSwipeDirection("right");
+
+    if (gotMatch) {
+      setMatchCount((prev) => prev + 1);
+      setMatchMessage(`It's a match with ${datingProfile.name}!`);
+    } else {
+      setMatchMessage("Liked! No match this time.");
+    }
+
+    setTimeout(() => {
+      loadNextDatingProfile();
+      setMatchMessage("");
+    }, 450);
+  }
+
+  const datingCardTransform =
+    swipeDirection === "left"
+      ? "translateX(-180px) rotate(-12deg)"
+      : swipeDirection === "right"
+      ? "translateX(180px) rotate(12deg)"
+      : "translateX(0) rotate(0deg)";
 
   function renderContent() {
     if (activeTab === "decide") {
@@ -226,28 +271,68 @@ function App() {
     if (activeTab === "dating") {
       return (
         <>
-          <h1
+          <div
             style={{
-              fontSize: "46px",
-              color: "#1f5f8b",
-              marginBottom: "6px",
-              fontWeight: "700",
-              whiteSpace: "nowrap",
+              position: "absolute",
+              top: "18px",
+              right: "22px",
+              zIndex: 4,
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
             }}
           >
-            HUNGRR Match
-          </h1>
+            <span style={{ fontSize: "28px" }}>💙</span>
+            <div
+              style={{
+                minWidth: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                backgroundColor: "#2f7fb5",
+                color: "white",
+                fontSize: "13px",
+                fontWeight: "700",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "0 6px",
+              }}
+            >
+              {matchCount}
+            </div>
+          </div>
 
-          <p
+          <div
             style={{
-              fontSize: "18px",
-              color: "#24506d",
-              marginBottom: "24px",
-              fontWeight: "500",
+              width: "100%",
+              textAlign: "center",
+              marginTop: "8px",
             }}
           >
-            Taste & Connect
-          </p>
+            <h1
+              style={{
+                fontSize: "46px",
+                color: "#1f5f8b",
+                marginBottom: "6px",
+                fontWeight: "700",
+                whiteSpace: "nowrap",
+                textAlign: "center",
+              }}
+            >
+              HUNGRR Match
+            </h1>
+
+            <p
+              style={{
+                fontSize: "18px",
+                color: "#24506d",
+                marginBottom: "24px",
+                fontWeight: "500",
+              }}
+            >
+              Taste & Connect
+            </p>
+          </div>
 
           <div
             style={{
@@ -257,6 +342,9 @@ function App() {
               borderRadius: "24px",
               padding: "22px",
               boxShadow: "0 8px 16px rgba(0,0,0,0.10)",
+              transform: datingCardTransform,
+              opacity: swipeDirection ? 0.65 : 1,
+              transition: "transform 0.4s ease, opacity 0.4s ease",
             }}
           >
             <div
@@ -323,6 +411,19 @@ function App() {
             </p>
           </div>
 
+          {matchMessage && (
+            <p
+              style={{
+                color: "#1f5f8b",
+                fontWeight: "600",
+                marginTop: "-6px",
+                marginBottom: "14px",
+              }}
+            >
+              {matchMessage}
+            </p>
+          )}
+
           <div
             style={{
               display: "flex",
@@ -332,6 +433,7 @@ function App() {
             }}
           >
             <button
+              onClick={handleDislike}
               onMouseEnter={() => setProfileHover("dislike")}
               onMouseLeave={() => setProfileHover(null)}
               style={{
@@ -351,6 +453,7 @@ function App() {
             </button>
 
             <button
+              onClick={handleLike}
               onMouseEnter={() => setProfileHover("like")}
               onMouseLeave={() => setProfileHover(null)}
               style={{
