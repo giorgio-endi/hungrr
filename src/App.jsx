@@ -1,75 +1,89 @@
-import { useState } from "react";
-
 function App() {
-  const [selectedMood, setSelectedMood] = useState("");
-
-  const moods = ["Spicy", "Salty", "Sweet", "Savory"];
-
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#fff8f3",
-        fontFamily: "Arial, sans-serif",
-        padding: "40px",
-        textAlign: "center",
+        backgroundColor: "#dff4ff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "'Trebuchet MS', 'Segoe UI', sans-serif",
       }}
     >
-      <h1 style={{ color: "#ff6b35", fontSize: "48px", marginBottom: "10px" }}>
-        HUNGRR 🍴
-      </h1>
-
-      <p style={{ fontSize: "20px", color: "#444", marginBottom: "30px" }}>
-        What are you in the mood for right now?
-      </p>
-
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "20px",
-          flexWrap: "wrap",
-          marginBottom: "30px",
+          backgroundColor: "white",
+          padding: "50px 40px",
+          borderRadius: "24px",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+          textAlign: "center",
+          width: "90%",
+          maxWidth: "500px",
         }}
       >
-        {moods.map((mood) => (
-          <button
-            key={mood}
-            onClick={() => setSelectedMood(mood)}
-            style={{
-              padding: "15px 25px",
-              fontSize: "18px",
-              borderRadius: "12px",
-              border: selectedMood === mood ? "3px solid #ff6b35" : "1px solid #ddd",
-              backgroundColor: selectedMood === mood ? "#ffe2d6" : "white",
-              cursor: "pointer",
-              minWidth: "130px",
-            }}
-          >
-            {mood}
-          </button>
-        ))}
-      </div>
-
-      {selectedMood && (
-        <div
+        <h1
           style={{
-            marginTop: "20px",
-            backgroundColor: "white",
-            padding: "25px",
-            borderRadius: "16px",
-            maxWidth: "500px",
-            marginLeft: "auto",
-            marginRight: "auto",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            fontSize: "56px",
+            color: "#1e6fa8",
+            marginBottom: "10px",
+            letterSpacing: "1px",
           }}
         >
-          <h2 style={{ color: "#333" }}>You chose: {selectedMood}</h2>
-          <p style={{ color: "#666", fontSize: "18px" }}>
-            Nice — we can now suggest dishes and restaurants that match your craving.
-          </p>
+          HUNGRR
+        </h1>
+
+        <p
+          style={{
+            fontSize: "28px",
+            color: "#2f4858",
+            marginBottom: "40px",
+            fontWeight: "500",
+          }}
+        >
+          What are you in the mood for?
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "18px",
+            alignItems: "center",
+          }}
+        >
+          <button
+            style={{
+              width: "220px",
+              padding: "16px",
+              fontSize: "20px",
+              borderRadius: "14px",
+              border: "none",
+              backgroundColor: "#4da8da",
+              color: "white",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Create Room
+          </button>
+
+          <button
+            style={{
+              width: "220px",
+              padding: "16px",
+              fontSize: "20px",
+              borderRadius: "14px",
+              border: "2px solid #4da8da",
+              backgroundColor: "white",
+              color: "#1e6fa8",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Join Room
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
