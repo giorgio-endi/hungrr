@@ -1,12 +1,73 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createRoom } from "./firestore";
 
 function App() {
   const [hovered, setHovered] = useState(null);
   const [roomCode, setRoomCode] = useState("");
   const [activeTab, setActiveTab] = useState("decide");
+  const [profileHover, setProfileHover] = useState(null);
 
-  const buttonStyle = (name) => ({
+  const datingProfile = useMemo(() => {
+    const names = [
+      "Alex",
+      "Jamie",
+      "Taylor",
+      "Jordan",
+      "Casey",
+      "Morgan",
+      "Avery",
+      "Riley",
+      "Cameron",
+      "Drew",
+      "Sam",
+      "Quinn",
+    ];
+
+    const foodBios = [
+      "Loves sushi, ramen, and boba.",
+      "Always craving burgers and fries.",
+      "Would never say no to hotpot.",
+      "Dessert first kind of person.",
+      "Big fan of tacos and late-night eats.",
+      "Pasta, matcha, and cafe hopping.",
+      "Spicy food is a personality trait.",
+      "Brunch lover with a soft spot for pancakes.",
+    ];
+
+    const favouriteFoods = [
+      "Sushi",
+      "Ramen",
+      "Hotpot",
+      "Burgers",
+      "Pasta",
+      "Tacos",
+      "Korean BBQ",
+      "Desserts",
+    ];
+
+    const moods = ["Savory", "Sweet", "Spicy", "Comfort Food", "Adventurous"];
+
+    const randomName = names[Math.floor(Math.random() * names.length)];
+    const randomBio = foodBios[Math.floor(Math.random() * foodBios.length)];
+    const randomFood =
+      favouriteFoods[Math.floor(Math.random() * favouriteFoods.length)];
+    const randomMood = moods[Math.floor(Math.random() * moods.length)];
+
+    const seed = `${randomName}-${randomFood}-${Math.floor(Math.random() * 10000)}`;
+    const avatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(
+      seed
+    )}`;
+
+    return {
+      name: randomName,
+      bio: randomBio,
+      food: randomFood,
+      mood: randomMood,
+      avatarUrl,
+    };
+  }, []);
+
+  const mainButtonStyle = (name) => ({
     width: "250px",
     padding: "18px",
     fontSize: "22px",
@@ -24,12 +85,29 @@ function App() {
   const navButtonStyle = (tabName) => ({
     flex: 1,
     border: "none",
-    backgroundColor: activeTab === tabName ? "#4da8da" : "transparent",
+    backgroundColor:
+      activeTab === tabName
+        ? "#4da8da"
+        : hovered === `nav-${tabName}`
+        ? "#c9e7f7"
+        : "transparent",
     color: activeTab === tabName ? "white" : "#1f5f8b",
     fontSize: "14px",
     fontWeight: "600",
     padding: "12px 6px",
     borderRadius: "14px",
+    cursor: "pointer",
+    transition: "0.2s",
+  });
+
+  const smallActionButton = (name, baseColor, hoverColor) => ({
+    width: "100px",
+    padding: "14px",
+    borderRadius: "14px",
+    border: "none",
+    backgroundColor: profileHover === name ? hoverColor : baseColor,
+    color: "white",
+    fontWeight: "600",
     cursor: "pointer",
     transition: "0.2s",
   });
@@ -126,7 +204,7 @@ function App() {
             onClick={handleCreateRoom}
             onMouseEnter={() => setHovered("create")}
             onMouseLeave={() => setHovered(null)}
-            style={buttonStyle("create")}
+            style={mainButtonStyle("create")}
           >
             Create Room
           </button>
@@ -134,7 +212,7 @@ function App() {
           <button
             onMouseEnter={() => setHovered("join")}
             onMouseLeave={() => setHovered(null)}
-            style={buttonStyle("join")}
+            style={mainButtonStyle("join")}
           >
             Join Room
           </button>
@@ -151,6 +229,8 @@ function App() {
               Room Code: {roomCode}
             </p>
           )}
+
+          <div style={{ height: "20px" }} />
         </>
       );
     }
@@ -199,11 +279,18 @@ function App() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                fontSize: "58px",
                 marginBottom: "16px",
+                overflow: "hidden",
               }}
             >
-              🍕
+              <img
+                src={datingProfile.avatarUrl}
+                alt="Generated profile"
+                style={{
+                  width: "130px",
+                  height: "130px",
+                }}
+              />
             </div>
 
             <h2
@@ -213,7 +300,7 @@ function App() {
                 margin: "0 0 8px 0",
               }}
             >
-              Alex
+              {datingProfile.name}
             </h2>
 
             <p
@@ -223,7 +310,17 @@ function App() {
                 margin: "0 0 6px 0",
               }}
             >
-              Loves sushi, ramen, and boba
+              {datingProfile.bio}
+            </p>
+
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#335c74",
+                margin: "0 0 6px 0",
+              }}
+            >
+              Favourite food: {datingProfile.food}
             </p>
 
             <p
@@ -233,7 +330,7 @@ function App() {
                 margin: 0,
               }}
             >
-              Looking for someone with similar cravings
+              Mood: {datingProfile.mood}
             </p>
           </div>
 
@@ -246,35 +343,23 @@ function App() {
             }}
           >
             <button
-              style={{
-                width: "100px",
-                padding: "14px",
-                borderRadius: "14px",
-                border: "none",
-                backgroundColor: "#7bbce4",
-                color: "white",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
+              onMouseEnter={() => setProfileHover("dislike")}
+              onMouseLeave={() => setProfileHover(null)}
+              style={smallActionButton("dislike", "#7bbce4", "#5ca4d3")}
             >
               Dislike
             </button>
 
             <button
-              style={{
-                width: "100px",
-                padding: "14px",
-                borderRadius: "14px",
-                border: "none",
-                backgroundColor: "#2f7fb5",
-                color: "white",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
+              onMouseEnter={() => setProfileHover("like")}
+              onMouseLeave={() => setProfileHover(null)}
+              style={smallActionButton("like", "#2f7fb5", "#1f5f8b")}
             >
               Like
             </button>
           </div>
+
+          <div style={{ height: "40px" }} />
         </>
       );
     }
@@ -315,10 +400,31 @@ function App() {
             alignItems: "center",
             fontSize: "72px",
             color: "white",
+            overflow: "hidden",
           }}
         >
           👤
         </div>
+
+        <button
+          onMouseEnter={() => setProfileHover("add-picture")}
+          onMouseLeave={() => setProfileHover(null)}
+          style={{
+            width: "230px",
+            padding: "14px",
+            borderRadius: "14px",
+            border: "none",
+            backgroundColor:
+              profileHover === "add-picture" ? "#2f7fb5" : "#4da8da",
+            color: "white",
+            fontWeight: "600",
+            cursor: "pointer",
+            transition: "0.2s",
+            marginBottom: "22px",
+          }}
+        >
+          Add a Profile Picture
+        </button>
 
         <div
           style={{
@@ -340,10 +446,15 @@ function App() {
           <p style={{ margin: "0 0 10px 0", color: "#1f5f8b" }}>
             <strong>Craving style:</strong> Savory
           </p>
+          <p style={{ margin: "0 0 10px 0", color: "#1f5f8b" }}>
+            <strong>Budget:</strong> $$
+          </p>
           <p style={{ margin: 0, color: "#1f5f8b" }}>
-            <strong>Budget:</strong> $$ 
+            <strong>Bio:</strong> Looking for someone with similar food taste.
           </p>
         </div>
+
+        <div style={{ height: "40px" }} />
       </>
     );
   }
@@ -375,8 +486,6 @@ function App() {
             borderRadius: "40px",
             position: "relative",
             overflow: "hidden",
-            padding: "70px 25px 95px 25px",
-            textAlign: "center",
             boxSizing: "border-box",
           }}
         >
@@ -390,6 +499,7 @@ function App() {
               backgroundColor: "#4da8da",
               borderRadius: "50%",
               opacity: 0.4,
+              zIndex: 1,
             }}
           />
 
@@ -403,10 +513,25 @@ function App() {
               backgroundColor: "#2f7fb5",
               borderRadius: "50%",
               opacity: 0.4,
+              zIndex: 1,
             }}
           />
 
-          <div style={{ position: "relative", zIndex: 2 }}>{renderContent()}</div>
+          <div
+            style={{
+              height: "100%",
+              overflowY: "auto",
+              padding: "70px 25px 130px 25px",
+              textAlign: "center",
+              boxSizing: "border-box",
+              position: "relative",
+              zIndex: 2,
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {renderContent()}
+          </div>
 
           <div
             style={{
@@ -414,7 +539,7 @@ function App() {
               bottom: "16px",
               left: "16px",
               right: "16px",
-              backgroundColor: "rgba(255,255,255,0.8)",
+              backgroundColor: "rgba(255,255,255,0.85)",
               borderRadius: "20px",
               padding: "8px",
               display: "flex",
@@ -425,6 +550,8 @@ function App() {
           >
             <button
               onClick={() => setActiveTab("decide")}
+              onMouseEnter={() => setHovered("nav-decide")}
+              onMouseLeave={() => setHovered(null)}
               style={navButtonStyle("decide")}
             >
               Decide
@@ -432,6 +559,8 @@ function App() {
 
             <button
               onClick={() => setActiveTab("dating")}
+              onMouseEnter={() => setHovered("nav-dating")}
+              onMouseLeave={() => setHovered(null)}
               style={navButtonStyle("dating")}
             >
               Dating
@@ -439,6 +568,8 @@ function App() {
 
             <button
               onClick={() => setActiveTab("profile")}
+              onMouseEnter={() => setHovered("nav-profile")}
+              onMouseLeave={() => setHovered(null)}
               style={navButtonStyle("profile")}
             >
               Profile
