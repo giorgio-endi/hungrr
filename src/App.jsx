@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
-import { createRoom } from "./firestore";
+import {
+  createRoom,
+  joinRoom,
+  subscribeToRoom,
+  startSwiping,
+} from "./firestore";
 
 function App() {
   const [hovered, setHovered] = useState(null);
@@ -17,6 +22,14 @@ function App() {
 
   const [matches, setMatches] = useState([]);
   const [messages, setMessages] = useState({});
+
+  // new Decide tab flow states
+  const [username, setUsername] = useState("");
+  const [location, setLocation] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [isHost, setIsHost] = useState(false);
+  const [roomData, setRoomData] = useState(null);
+  const [decideScreen, setDecideScreen] = useState("home");
 
   const datingProfile = useMemo(() => {
     const names = [
@@ -103,8 +116,8 @@ function App() {
       activeTab === tabName
         ? "#4da8da"
         : hovered === `nav-${tabName}`
-        ? "#c9e7f7"
-        : "transparent",
+          ? "#c9e7f7"
+          : "transparent",
     color: activeTab === tabName ? "white" : "#1f5f8b",
     fontSize: "14px",
     fontWeight: "600",
@@ -113,6 +126,17 @@ function App() {
     cursor: "pointer",
     transition: "0.2s",
   });
+
+  const inputStyle = {
+    width: "250px",
+    padding: "14px",
+    borderRadius: "14px",
+    border: "none",
+    outline: "none",
+    fontSize: "15px",
+    marginTop: "12px",
+    boxSizing: "border-box",
+  };
 
   function generateRoomCode() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -126,14 +150,82 @@ function App() {
     return code;
   }
 
+  function listenToRoom(code) {
+    subscribeToRoom(code, (data) => {
+      if (!data) return;
+
+      setRoomData(data);
+
+      if (data.status === "swiping") {
+        setDecideScreen("swipe");
+      } else {
+        setDecideScreen("room");
+      }
+    });
+  }
+
   async function handleCreateRoom() {
+    if (username.trim() === "") {
+      alert("Please enter your name first");
+      return;
+    }
+
+    if (location.trim() === "") {
+      alert("Please enter a location");
+      return;
+    }
+
     try {
       const code = generateRoomCode();
-      await createRoom(code);
+      const cleanName = username.trim();
+      const cleanLocation = location.trim();
+
+      await createRoom(code, cleanLocation, cleanName);
+      await joinRoom(code, cleanName);
+
       setRoomCode(code);
+      setJoinCode(code);
+      setIsHost(true);
+
+      listenToRoom(code);
+      setDecideScreen("room");
+      setActiveTab("decide");
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
+    }
+  }
+
+  async function handleJoinRoom() {
+    if (username.trim() === "" || joinCode.trim() === "") {
+      alert("Please enter your name and room code");
+      return;
+    }
+
+    try {
+      const cleanCode = joinCode.trim().toUpperCase();
+      const cleanName = username.trim();
+
+      await joinRoom(cleanCode, cleanName);
+
+      setRoomCode(cleanCode);
+      setIsHost(false);
+
+      listenToRoom(cleanCode);
+      setDecideScreen("room");
+      setActiveTab("decide");
+    } catch (error) {
+      console.error(error);
+      alert("Could not join room");
+    }
+  }
+
+  async function handleStartSwiping() {
+    try {
+      await startSwiping(roomCode);
+    } catch (error) {
+      console.error(error);
+      alert("Could not start swiping");
     }
   }
 
@@ -223,10 +315,14 @@ function App() {
     swipeDirection === "left"
       ? "translateX(-180px) rotate(-12deg)"
       : swipeDirection === "right"
-      ? "translateX(180px) rotate(12deg)"
-      : "translateX(0) rotate(0deg)";
+        ? "translateX(180px) rotate(12deg)"
+        : "translateX(0) rotate(0deg)";
 
   function renderTopRightIcons() {
+    if (activeTab !== "dating") {
+      return null;
+    }
+
     return (
       <div
         style={{
@@ -618,6 +714,345 @@ function App() {
     );
   }
 
+  function renderDecideHomeScreen() {
+    return (
+      <>
+        <h1
+          style={{
+            fontSize: "42px",
+            color: "#1f5f8b",
+            marginBottom: "5px",
+            fontWeight: "700",
+          }}
+        >
+          HUNGRR
+        </h1>
+
+        <p
+          style={{
+            fontSize: "20px",
+            color: "#24506d",
+            marginBottom: "26px",
+            fontWeight: "500",
+          }}
+        >
+          Taste & Decide
+        </p>
+
+        <div
+          style={{
+            margin: "0 auto 28px auto",
+            width: "160px",
+            height: "160px",
+            borderRadius: "50%",
+            backgroundColor: "#5bb8eb",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "78px",
+            boxShadow: "inset 0 0 0 8px rgba(255,255,255,0.08)",
+          }}
+        >
+          🍽️
+        </div>
+
+        <p
+          style={{
+            fontSize: "20px",
+            color: "#1f5f8b",
+            fontWeight: "600",
+            marginBottom: "10px",
+          }}
+        >
+          What are you in the mood for?
+        </p>
+
+        <p
+          style={{
+            fontSize: "15px",
+            color: "#335c74",
+            marginBottom: "10px",
+            lineHeight: "1.5",
+          }}
+        >
+          Create or join a room and decide together what to eat.
+        </p>
+
+        <input
+          type="text"
+          placeholder="Enter your name"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Enter location (for host)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Enter room code (for guest)"
+          value={joinCode}
+          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+          style={inputStyle}
+        />
+
+        <button
+          onClick={handleCreateRoom}
+          onMouseEnter={() => setHovered("create")}
+          onMouseLeave={() => setHovered(null)}
+          style={mainButtonStyle("create")}
+        >
+          Create Room
+        </button>
+
+        <button
+          onClick={handleJoinRoom}
+          onMouseEnter={() => setHovered("join")}
+          onMouseLeave={() => setHovered(null)}
+          style={mainButtonStyle("join")}
+        >
+          Join Room
+        </button>
+
+        {roomCode !== "" && decideScreen === "home" && (
+          <p
+            style={{
+              marginTop: "20px",
+              fontSize: "18px",
+              color: "#1f5f8b",
+              fontWeight: "500",
+            }}
+          >
+            Room Code: {roomCode}
+          </p>
+        )}
+
+        <div style={{ height: "20px" }} />
+      </>
+    );
+  }
+
+  function renderRoomLobbyScreen() {
+    const users = roomData?.users || [];
+
+    return (
+      <>
+        <h1
+          style={{
+            fontSize: "36px",
+            color: "#1f5f8b",
+            marginBottom: "8px",
+            fontWeight: "700",
+            marginTop: "10px",
+          }}
+        >
+          Room Lobby
+        </h1>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#24506d",
+            marginBottom: "22px",
+          }}
+        >
+          Waiting for everyone to join.
+        </p>
+
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "20px",
+            padding: "20px",
+            boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
+            textAlign: "left",
+          }}
+        >
+          <p style={{ margin: "0 0 10px 0", color: "#1f5f8b" }}>
+            <strong>Room Code:</strong> {roomData?.code || roomCode}
+          </p>
+          <p style={{ margin: "0 0 10px 0", color: "#1f5f8b" }}>
+            <strong>Location:</strong> {roomData?.location}
+          </p>
+          <p style={{ margin: "0 0 10px 0", color: "#1f5f8b" }}>
+            <strong>Host:</strong> {roomData?.host}
+          </p>
+          <p style={{ margin: "0 0 12px 0", color: "#1f5f8b" }}>
+            <strong>Status:</strong> {roomData?.status}
+          </p>
+
+          <div>
+            <p
+              style={{
+                margin: "0 0 8px 0",
+                color: "#1f5f8b",
+                fontWeight: "700",
+              }}
+            >
+              Joined Users
+            </p>
+
+            {users.length === 0 ? (
+              <p style={{ margin: 0, color: "#335c74" }}>No users yet</p>
+            ) : (
+              users.map((user, index) => (
+                <p
+                  key={index}
+                  style={{ margin: "0 0 6px 0", color: "#335c74" }}
+                >
+                  • {user}
+                </p>
+              ))
+            )}
+          </div>
+        </div>
+
+        {isHost ? (
+          <button
+            onClick={handleStartSwiping}
+            onMouseEnter={() => setHovered("start")}
+            onMouseLeave={() => setHovered(null)}
+            style={mainButtonStyle("start")}
+          >
+            Start Swiping
+          </button>
+        ) : (
+          <p
+            style={{
+              marginTop: "24px",
+              color: "#1f5f8b",
+              fontWeight: "500",
+            }}
+          >
+            Waiting for host to start...
+          </p>
+        )}
+      </>
+    );
+  }
+
+  function renderDecideSwipeScreen() {
+    return (
+      <>
+        <h1
+          style={{
+            fontSize: "36px",
+            color: "#1f5f8b",
+            marginBottom: "8px",
+            fontWeight: "700",
+            marginTop: "10px",
+          }}
+        >
+          Swipe Restaurants
+        </h1>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#24506d",
+            marginBottom: "22px",
+          }}
+        >
+          Room location: {roomData?.location}
+        </p>
+
+        <div
+          style={{
+            margin: "0 auto 24px auto",
+            width: "240px",
+            backgroundColor: "white",
+            borderRadius: "24px",
+            padding: "22px",
+            boxShadow: "0 8px 16px rgba(0,0,0,0.10)",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              height: "180px",
+              borderRadius: "18px",
+              backgroundColor: "#dff2ff",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: "16px",
+              fontSize: "64px",
+            }}
+          >
+            🍜
+          </div>
+
+          <h2
+            style={{
+              fontSize: "24px",
+              color: "#1f5f8b",
+              margin: "0 0 8px 0",
+            }}
+          >
+            Restaurant cards go here
+          </h2>
+
+          <p
+            style={{
+              fontSize: "15px",
+              color: "#335c74",
+              margin: "0 0 6px 0",
+            }}
+          >
+            Next step: load restaurants based on the room location.
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "16px",
+            marginTop: "10px",
+          }}
+        >
+          <button
+            style={{
+              width: "110px",
+              padding: "14px",
+              borderRadius: "14px",
+              border: "none",
+              backgroundColor: "#4da8da",
+              color: "white",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            Dislike
+          </button>
+
+          <button
+            style={{
+              width: "110px",
+              padding: "14px",
+              borderRadius: "14px",
+              border: "none",
+              backgroundColor: "#4da8da",
+              color: "white",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            Like
+          </button>
+        </div>
+
+        <div style={{ height: "40px" }} />
+      </>
+    );
+  }
+
   function renderContent() {
     if (currentScreen === "matches") {
       return renderMatchesScreen();
@@ -632,102 +1067,19 @@ function App() {
     }
 
     if (activeTab === "decide") {
-      return (
-        <>
-          <h1
-            style={{
-              fontSize: "42px",
-              color: "#1f5f8b",
-              marginBottom: "5px",
-              fontWeight: "700",
-            }}
-          >
-            HUNGRR
-          </h1>
+      if (decideScreen === "home") {
+        return renderDecideHomeScreen();
+      }
 
-          <p
-            style={{
-              fontSize: "20px",
-              color: "#24506d",
-              marginBottom: "26px",
-              fontWeight: "500",
-            }}
-          >
-            Taste & Decide
-          </p>
+      if (decideScreen === "room") {
+        return renderRoomLobbyScreen();
+      }
 
-          <div
-            style={{
-              margin: "0 auto 28px auto",
-              width: "160px",
-              height: "160px",
-              borderRadius: "50%",
-              backgroundColor: "#5bb8eb",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "78px",
-              boxShadow: "inset 0 0 0 8px rgba(255,255,255,0.08)",
-            }}
-          >
-            🍽️
-          </div>
+      if (decideScreen === "swipe") {
+        return renderDecideSwipeScreen();
+      }
 
-          <p
-            style={{
-              fontSize: "20px",
-              color: "#1f5f8b",
-              fontWeight: "600",
-              marginBottom: "10px",
-            }}
-          >
-            What are you in the mood for?
-          </p>
-
-          <p
-            style={{
-              fontSize: "15px",
-              color: "#335c74",
-              marginBottom: "22px",
-              lineHeight: "1.5",
-            }}
-          >
-            Create or join a room and decide together what to eat.
-          </p>
-
-          <button
-            onClick={handleCreateRoom}
-            onMouseEnter={() => setHovered("create")}
-            onMouseLeave={() => setHovered(null)}
-            style={mainButtonStyle("create")}
-          >
-            Create Room
-          </button>
-
-          <button
-            onMouseEnter={() => setHovered("join")}
-            onMouseLeave={() => setHovered(null)}
-            style={mainButtonStyle("join")}
-          >
-            Join Room
-          </button>
-
-          {roomCode !== "" && (
-            <p
-              style={{
-                marginTop: "20px",
-                fontSize: "18px",
-                color: "#1f5f8b",
-                fontWeight: "500",
-              }}
-            >
-              Room Code: {roomCode}
-            </p>
-          )}
-
-          <div style={{ height: "20px" }} />
-        </>
-      );
+      return renderDecideHomeScreen();
     }
 
     if (activeTab === "dating") {
@@ -1098,7 +1450,6 @@ function App() {
             <button
               onClick={() => {
                 setActiveTab("decide");
-                setCurrentScreen("main");
               }}
               onMouseEnter={() => setHovered("nav-decide")}
               onMouseLeave={() => setHovered(null)}
