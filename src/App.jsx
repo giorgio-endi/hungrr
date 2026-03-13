@@ -100,18 +100,6 @@ function App() {
     transition: "0.2s",
   });
 
-  const smallActionButton = (name, baseColor, hoverColor) => ({
-    width: "100px",
-    padding: "14px",
-    borderRadius: "14px",
-    border: "none",
-    backgroundColor: profileHover === name ? hoverColor : baseColor,
-    color: "white",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "0.2s",
-  });
-
   function generateRoomCode() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
@@ -240,10 +228,11 @@ function App() {
         <>
           <h1
             style={{
-              fontSize: "38px",
+              fontSize: "46px",
               color: "#1f5f8b",
               marginBottom: "6px",
               fontWeight: "700",
+              whiteSpace: "nowrap",
             }}
           >
             HUNGRR Match
@@ -263,7 +252,7 @@ function App() {
           <div
             style={{
               margin: "0 auto 24px auto",
-              width: "220px",
+              width: "240px",
               backgroundColor: "white",
               borderRadius: "24px",
               padding: "22px",
@@ -345,7 +334,18 @@ function App() {
             <button
               onMouseEnter={() => setProfileHover("dislike")}
               onMouseLeave={() => setProfileHover(null)}
-              style={smallActionButton("dislike", "#7bbce4", "#5ca4d3")}
+              style={{
+                width: "110px",
+                padding: "14px",
+                borderRadius: "14px",
+                border: "none",
+                backgroundColor:
+                  profileHover === "dislike" ? "#2f7fb5" : "#4da8da",
+                color: "white",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "0.2s",
+              }}
             >
               Dislike
             </button>
@@ -353,7 +353,18 @@ function App() {
             <button
               onMouseEnter={() => setProfileHover("like")}
               onMouseLeave={() => setProfileHover(null)}
-              style={smallActionButton("like", "#2f7fb5", "#1f5f8b")}
+              style={{
+                width: "110px",
+                padding: "14px",
+                borderRadius: "14px",
+                border: "none",
+                backgroundColor:
+                  profileHover === "like" ? "#2f7fb5" : "#4da8da",
+                color: "white",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "0.2s",
+              }}
             >
               Like
             </button>
@@ -479,8 +490,8 @@ function App() {
       >
         <div
           style={{
-            width: "330px",
-            height: "650px",
+            width: "380px",
+            height: "720px",
             backgroundColor: "#8ed6ff",
             border: "10px solid black",
             borderRadius: "40px",
