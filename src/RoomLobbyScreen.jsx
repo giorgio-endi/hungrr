@@ -11,21 +11,18 @@ function RoomLobbyScreen({
 }) {
   const users = roomData?.users || [];
 
-   const mainButtonStyle = (name) => ({
-        width: "250px",
-        padding: "18px",
-        fontSize: "22px",
-        borderRadius: "7px",
-        border: "none",
-        backgroundColor: hovered === name ? "#781715" : "#991c1a",
-        fontFamily: "Ubuntu",
-        color: "white",
-        cursor: "pointer",
-        marginTop: "18px",
-        fontWeight: "600",
-        transition: "0.25s",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-    });
+  const mainButtonStyle = (name) => ({
+    width: "250px",
+    padding: "18px",
+    fontSize: "22px",
+    borderRadius: "16px",
+    border: "none",
+    backgroundColor: hovered === name ? "#781715" : "#991c1a",
+    color: "white",
+    cursor: "pointer",
+    marginTop: "18px",
+    fontWeight: "600",
+  });
 
   return (
     <div style={{ position: "relative", paddingTop: "60px" }}>
@@ -41,19 +38,17 @@ function RoomLobbyScreen({
           fontSize: "28px",
           cursor: "pointer",
           color: "#020100",
-          zIndex: 20, 
+          zIndex: 20, // above everything
         }}
       >
         <MdArrowBack />
       </button>
 
-      <h1>
+      <h1 style={{marginBottom: "10px"}}>
         Room Lobby
       </h1>
 
-      <p style={{marginTop: "10px",
-        marginBottom:"45px"
-      }}>
+      <p style={{marginBottom: "45px"}}>
         Waiting for everyone to join.
       </p>
 
@@ -65,6 +60,7 @@ function RoomLobbyScreen({
           boxShadow: "0 8px 16px rgba(0,0,0,0.08)",
           textAlign: "left",
           marginTop: "20px",
+          marginBottom: "20pz",
         }}
       >
         <p>

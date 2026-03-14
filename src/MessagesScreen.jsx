@@ -1,3 +1,7 @@
+import { FaUser } from "react-icons/fa";
+
+import React from "react";
+
 function MessagesScreen({ matches, messages, openChat, goBack }) {
   return (
     <>
@@ -21,19 +25,7 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
             <button
               key={match.id}
               onClick={() => openChat(match)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                width: "100%",
-                backgroundColor: "white",
-                border: "none",
-                borderRadius: "16px",
-                padding: "12px",
-                marginBottom: "12px",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
+              className="message-btn"
             >
               {match.photoURL ? (
                 <img
@@ -52,27 +44,29 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
                     width: "50px",
                     height: "50px",
                     borderRadius: "50%",
-                    backgroundColor: "#dff2ff",
+                    backgroundColor: "#020100",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                   }}
                 >
-                  👤
+                  <FaUser></FaUser>
                 </div>
               )}
 
               <div
                 style={{
-                  flex: 1,          
-                  minWidth: 0,       
+                  flex: 1,
+                  minWidth: 0,
+                  marginLeft: "8px",
+                  textAlign: "left",
                 }}
               >
                 <p
                   style={{
                     margin: 0,
                     fontWeight: "700",
-                    color: "#1f5f8b",
+                    color: "#020100",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -83,7 +77,7 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
                 <p
                   style={{
                     margin: 0,
-                    color: "#335c74",
+                    color: "#020100",
                     fontSize: "14px",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
@@ -97,6 +91,32 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
           );
         })
       )}
+
+      {/* HOVER EFFECT */}
+      <style>
+        {`
+          .message-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            background-color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s ease;
+          }
+          .message-btn:hover {
+            background-color: #fdd0cd;
+          }
+          .message-btn:hover p {
+            color: #000000;
+          }
+        `}
+      </style>
     </>
   );
 }

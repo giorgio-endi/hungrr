@@ -42,7 +42,8 @@ function TopRightIcons({
                         style={{
                             background: "transparent",
                             border: "none",
-                            fontSize: "22px",
+                            marginTop: "10px",
+                            fontSize: "30px",
                             cursor: "pointer",
                             color: "#020100",
                         }}

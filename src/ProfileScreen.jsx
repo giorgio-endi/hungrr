@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { saveUserProfile, signOutUser } from "./firestore";
+import { FaUser } from "react-icons/fa";
 
 function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
   const [saving, setSaving] = useState(false);
@@ -29,55 +30,7 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  function resizeImageToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      const img = new Image();
-
-      reader.onload = (event) => {
-        img.src = event.target.result;
-      };
-
-      reader.onerror = reject;
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        const maxSize = 220;
-        let { width, height } = img;
-
-        if (width > height) {
-          if (width > maxSize) {
-            height = Math.round((height * maxSize) / width);
-            width = maxSize;
-          }
-        } else {
-          if (height > maxSize) {
-            width = Math.round((width * maxSize) / height);
-            height = maxSize;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.65);
-        resolve(compressedBase64);
-      };
-
-      img.onerror = reject;
-
-      reader.readAsDataURL(file);
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleFileChange(e) {
@@ -86,194 +39,193 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
 
     try {
       setSaving(true);
-
-      const base64Image = await resizeImageToBase64(file);
-
-      const updatedProfile = {
-        ...formData,
-        uid: currentUser.uid,
-        photoURL: base64Image,
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Image = event.target.result;
+        const updatedProfile = { ...formData, uid: currentUser.uid, photoURL: base64Image };
+        setFormData(updatedProfile);
+        setUserProfile(updatedProfile);
+        await saveUserProfile(currentUser.uid, updatedProfile);
+        alert("Profile picture uploaded!");
+        setSaving(false);
       };
-
-      setFormData(updatedProfile);
-      setUserProfile(updatedProfile);
-
-      await saveUserProfile(currentUser.uid, updatedProfile);
-
-      alert("Profile picture uploaded!");
-    } catch (error) {
-      console.error(error);
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error(err);
       alert("Could not upload profile picture.");
-    } finally {
       setSaving(false);
     }
   }
 
   async function handleSaveProfile() {
     if (!currentUser) return;
-
     try {
       setSaving(true);
-
-      const updatedProfile = {
-        ...formData,
-        uid: currentUser.uid,
-      };
-
+      const updatedProfile = { ...formData, uid: currentUser.uid };
       await saveUserProfile(currentUser.uid, updatedProfile);
       setUserProfile(updatedProfile);
       alert("Profile saved!");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert("Could not save profile.");
     } finally {
       setSaving(false);
     }
   }
 
+  // ----- STYLES -----
+  const inputStyle = {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "7px",
+    border: "none",
+    outline: "none",
+    fontSize: "14px",
+    marginTop: "5px",
+    marginBottom: "12px",
+    boxSizing: "border-box",
+    backgroundColor: "#fdd0cd",
+    color: "#000",
+  };
+
+  const labelStyle = { fontSize: "13px", fontWeight: "600", color: "#020100", marginTop: "10px" };
+
+  const formBoxStyle = {
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "18px",
+    padding: "20px",
+    width: "100%",
+    maxWidth: "260px",
+    margin: "0 auto",
+    backgroundColor: "white",
+    boxSizing: "border-box",
+    textAlign: "left",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+  };
+
+  // ----- RENDER -----
   return (
-    <>
-      <h1>Your Profile</h1>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      {/* TOP BAR SPACE */}
+      <div style={{ height: "20px", backgroundColor: "#f4f8f9", flexShrink: 0 }} />
 
+      {/* SCROLLABLE CONTENT */}
       <div
+        className="no-scrollbar"
         style={{
-          width: "220px",
-          height: "220px",
-          borderRadius: "50%",
-          backgroundColor: "#5bb8eb",
-          margin: "0 auto 24px auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          overflow: "hidden",
+          flex: 1,
+          overflowY: "auto",
+          padding: "20px 25px",
+          textAlign: "center",
+          boxSizing: "border-box",
         }}
       >
-        {formData.photoURL ? (
-          <img
-            src={formData.photoURL}
-            alt="Profile"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
+      <div style={{marginBottom: "25px"}}>
+        <h1>
+        Your Profile
+        </h1>
+      </div>
+
+        {/* PROFILE IMAGE */}
+        <div
+          style={{
+            width: "200px",
+            height: "200px",
+            borderRadius: "50%",
+            backgroundColor: "#020100",
+            margin: "0 auto 30px auto",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            overflow: "hidden",
+            cursor: "pointer",
+          }}
+          onClick={() => fileInputRef.current.click()}
+        >
+          {formData.photoURL ? (
+            <img src={formData.photoURL} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <span style={{ fontSize: "72px", color: "#f4f8f9" }}>
+              <FaUser />
+            </span>
+          )}
+        </div>
+
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+
+        {/* FORM */}
+        <div style={formBoxStyle}>
+          <p style={labelStyle}>Username</p>
+          <input name="username" value={formData.username} onChange={handleChange} style={inputStyle} />
+
+          <p style={labelStyle}>Favourite Food</p>
+          <input name="favouriteFood" value={formData.favouriteFood} onChange={handleChange} style={inputStyle} />
+
+          <p style={labelStyle}>Craving Style</p>
+          <input name="cravingStyle" value={formData.cravingStyle} onChange={handleChange} style={inputStyle} />
+
+          <p style={labelStyle}>Budget</p>
+          <input name="budget" value={formData.budget} onChange={handleChange} style={inputStyle} />
+
+          <p style={labelStyle}>Bio</p>
+          <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
+            rows="4"
+            style={{ ...inputStyle, resize: "none", marginBottom: "50px", fontFamily: "inherit" }}
           />
-        ) : (
-          <span style={{ fontSize: "72px", color: "white" }}>👤</span>
-        )}
+
+          <button onClick={handleSaveProfile} disabled={saving} className="hover-darken save-btn">
+            {saving ? "Saving..." : "Save Profile"}
+          </button>
+
+          <button onClick={signOutUser} className="hover-darken logout-btn">
+            Sign Out
+          </button>
+        </div>
       </div>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-      />
+      {/* HIDE SCROLLBAR & BUTTON HOVER */}
+      <style>
+        {`
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;     /* Firefox */
+          }
 
-      <button
-        onClick={() => fileInputRef.current.click()}
-        style={{
-          width: "230px",
-          padding: "14px",
-          borderRadius: "14px",
-          border: "none",
-          backgroundColor: "#4da8da",
-          color: "white",
-          fontWeight: "600",
-          cursor: "pointer",
-          marginBottom: "18px",
-        }}
-      >
-        {saving ? "Uploading..." : "Add Profile Picture"}
-      </button>
-
-      <div
-        style={{
-          backgroundColor: "white",
-          borderRadius: "20px",
-          padding: "20px",
-          width: "260px",
-          margin: "0 auto",
-          textAlign: "left",
-        }}
-      >
-        <p><strong>Username</strong></p>
-        <input
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-        />
-
-        <p><strong>Favourite food</strong></p>
-        <input
-          name="favouriteFood"
-          value={formData.favouriteFood}
-          onChange={handleChange}
-          style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-        />
-
-        <p><strong>Craving style</strong></p>
-        <input
-          name="cravingStyle"
-          value={formData.cravingStyle}
-          onChange={handleChange}
-          style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-        />
-
-        <p><strong>Budget</strong></p>
-        <input
-          name="budget"
-          value={formData.budget}
-          onChange={handleChange}
-          style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-        />
-
-        <p><strong>Bio</strong></p>
-        <textarea
-          name="bio"
-          value={formData.bio}
-          onChange={handleChange}
-          rows="4"
-          style={{ width: "100%", marginBottom: "14px", padding: "8px" }}
-        />
-
-        <button
-          onClick={handleSaveProfile}
-          disabled={saving}
-          style={{
-            width: "100%",
-            padding: "12px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#2f7fb5",
-            color: "white",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
-        >
-          {saving ? "Saving..." : "Save Profile"}
-        </button>
-
-        <button
-          onClick={signOutUser}
-          style={{
-            width: "100%",
-            margin: "17px auto",
-            padding: "12px",
-            backgroundColor: "#e63946",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
-        >
-          Sign Out
-        </button>
-      </div>
-    </>
+          /* BUTTON HOVER EFFECT */
+          .hover-darken {
+            width: 100%;
+            padding: 14px;
+            border-radius: 7px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: filter 0.2s;
+          }
+          .save-btn {
+            background-color: #4b6043;
+          }
+          .save-btn:hover {
+            filter: brightness(0.85);
+          }
+          .logout-btn {
+            background-color: #991c1a;
+          }
+          .logout-btn:hover {
+            filter: brightness(0.85);
+          }
+        `}
+      </style>
+    </div>
   );
 }
 

@@ -1,11 +1,14 @@
+import { FaUser } from "react-icons/fa";
+
 function MatchesScreen({ matches, openChat, goBack }) {
   return (
     <>
-
-      <div style = {{
-        marginTop: "40px",
-        marginBottom: "25px"
-      }}>
+      <div
+        style={{
+          marginTop: "40px",
+          marginBottom: "25px",
+        }}
+      >
         <h1>Your Matches</h1>
       </div>
 
@@ -13,23 +16,7 @@ function MatchesScreen({ matches, openChat, goBack }) {
         <p>No matches yet.</p>
       ) : (
         matches.map((match) => (
-          <button
-            key={match.id}
-            onClick={() => openChat(match)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              width: "100%",
-              backgroundColor: "white",
-              border: "none",
-              borderRadius: "16px",
-              padding: "12px",
-              marginBottom: "12px",
-              cursor: "pointer",
-              textAlign: "left",
-            }}
-          >
+          <button key={match.id} onClick={() => openChat(match)} className="match-btn">
             {match.photoURL ? (
               <img
                 src={match.photoURL}
@@ -47,27 +34,71 @@ function MatchesScreen({ matches, openChat, goBack }) {
                   width: "50px",
                   height: "50px",
                   borderRadius: "50%",
-                  backgroundColor: "#dff2ff",
+                  backgroundColor: "#020100",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                👤
+                <FaUser />
               </div>
             )}
 
-            <div>
-              <p style={{ margin: 0, fontWeight: "700", color: "#1f5f8b" }}>
+            <div style={{ marginLeft: "8px", textAlign: "left", flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontWeight: "700",
+                  color: "#020100",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {match.username}
               </p>
-              <p style={{ margin: 0, color: "#335c74", fontSize: "14px" }}>
+              <p
+                style={{
+                  margin: 0,
+                  color: "#020100",
+                  fontSize: "14px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {match.favouriteFood || "No favourite food yet"}
               </p>
             </div>
           </button>
         ))
       )}
+
+      {/* HOVER EFFECT */}
+      <style>
+        {`
+          .match-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            background-color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s ease;
+          }
+          .match-btn:hover {
+            background-color: #fdd0cd;
+          }
+          .match-btn:hover p {
+            color: #000000;
+          }
+        `}
+      </style>
     </>
   );
 }
