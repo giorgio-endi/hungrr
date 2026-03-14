@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { searchRestaurants } from "../api/restaurants";
 import RestaurantCard from "./RestaurantCard";
 
-function RestaurantSwipeScreen({ roomData }) {
+function RestaurantSwipeScreen({ roomData, goBack }) {
   const [restaurants, setRestaurants] = useState([]);
   const [restaurantIndex, setRestaurantIndex] = useState(0);
   const [restaurantsLoading, setRestaurantsLoading] = useState(false);
@@ -24,14 +24,14 @@ function RestaurantSwipeScreen({ roomData }) {
         setRestaurantIndex(0);
       } catch (error) {
         console.error(error);
-        setRestaurantsError("Could not load restaurants");
+        setRestaurantsError(error.message || "Could not load restaurants");
       } finally {
         setRestaurantsLoading(false);
       }
     }
 
     loadRestaurants();
-  }, [roomData]);
+  }, [roomData?.location]);
 
   const currentRestaurant = restaurants[restaurantIndex];
 
@@ -46,6 +46,20 @@ function RestaurantSwipeScreen({ roomData }) {
 
   return (
     <>
+      <button
+        onClick={goBack}
+        style={{
+          border: "none",
+          background: "transparent",
+          fontSize: "22px",
+          cursor: "pointer",
+          color: "#1f5f8b",
+          marginBottom: "10px",
+        }}
+      >
+        ← Back
+      </button>
+
       <h1
         style={{
           fontSize: "36px",
@@ -62,7 +76,7 @@ function RestaurantSwipeScreen({ roomData }) {
         style={{
           fontSize: "16px",
           color: "#24506d",
-          marginBottom: "22px",
+          marginBottom: "18px",
         }}
       >
         Room location: {roomData?.location}
@@ -84,6 +98,7 @@ function RestaurantSwipeScreen({ roomData }) {
           justifyContent: "center",
           gap: "16px",
           marginTop: "10px",
+          marginBottom: "120px",
         }}
       >
         <button
@@ -119,7 +134,7 @@ function RestaurantSwipeScreen({ roomData }) {
         </button>
       </div>
 
-      <div style={{ height: "40px" }} />
+      <div style={{ height: "120px" }} />
     </>
   );
 }

@@ -1,4 +1,4 @@
-function AppShell({ children }) {
+function AppShell({ topRight, content, bottomNav }) {
     return (
         <div
             style={{
@@ -23,20 +23,37 @@ function AppShell({ children }) {
                 }}
             >
 
+                {topRight}
+
                 <div
                     style={{
-                        height: "100%",
+                        position: "absolute",
+                        top: "0",
+                        left: "0",
+                        right: "0",
+                        bottom: "78px",
                         overflowY: "auto",
-                        padding: "70px 25px 130px 25px",
+                        padding: "70px 25px 25px 25px",
                         textAlign: "center",
                         boxSizing: "border-box",
-                        position: "relative",
                         zIndex: 2,
                         scrollbarWidth: "none",
                         msOverflowStyle: "none",
                     }}
                 >
-                    {children}
+                    {content}
+                </div>
+
+                <div
+                    style={{
+                        position: "absolute",
+                        left: "16px",
+                        right: "16px",
+                        bottom: "16px",
+                        zIndex: 4,
+                    }}
+                >
+                    {bottomNav}
                 </div>
             </div>
         </div>

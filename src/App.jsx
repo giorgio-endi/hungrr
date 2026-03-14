@@ -1,10 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createRoom,
   joinRoom,
   subscribeToRoom,
   startSwiping,
+  getUserProfile,
+  signOutUser,
+  getAllProfilesExceptCurrentUser,
+  getUserMatches,
+  createMatch,
+  sendMessage,
+  subscribeToMessages,
 } from "./firestore";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+
+import AppHomeScreen from "./AppHomeScreen";
 
 import AppShell from "./AppShell";
 import BottomNav from "./BottomNav";
@@ -30,7 +41,6 @@ function App() {
   const [matchCount, setMatchCount] = useState(0);
   const [matchMessage, setMatchMessage] = useState("");
   const [swipeDirection, setSwipeDirection] = useState("");
-  const [profileKey, setProfileKey] = useState(0);
 
   const [currentScreen, setCurrentScreen] = useState("main");
   const [selectedChat, setSelectedChat] = useState(null);
@@ -38,6 +48,7 @@ function App() {
 
   const [matches, setMatches] = useState([]);
   const [messages, setMessages] = useState({});
+  const [activeMatchId, setActiveMatchId] = useState(null);
 
   const [username, setUsername] = useState("");
   const [location, setLocation] = useState("");
@@ -46,68 +57,93 @@ function App() {
   const [roomData, setRoomData] = useState(null);
   const [decideScreen, setDecideScreen] = useState("home");
 
-  const datingProfile = useMemo(() => {
-    const names = [
-      "Alex",
-      "Jamie",
-      "Taylor",
-      "Jordan",
-      "Casey",
-      "Morgan",
-      "Avery",
-      "Riley",
-      "Cameron",
-      "Drew",
-      "Sam",
-      "Quinn",
-    ];
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-    const foodBios = [
-      "Loves sushi, ramen, and boba.",
-      "Always craving burgers and fries.",
-      "Would never say no to hotpot.",
-      "Dessert first kind of person.",
-      "Big fan of tacos and late-night eats.",
-      "Pasta, matcha, and cafe hopping.",
-      "Spicy food is a personality trait.",
-      "Brunch lover with a soft spot for pancakes.",
-    ];
+  const [allDatingProfiles, setAllDatingProfiles] = useState([]);
+  const [datingIndex, setDatingIndex] = useState(0);
 
-    const favouriteFoods = [
-      "Sushi",
-      "Ramen",
-      "Hotpot",
-      "Burgers",
-      "Pasta",
-      "Tacos",
-      "Korean BBQ",
-      "Desserts",
-    ];
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
 
-    const moods = ["Savory", "Sweet", "Spicy", "Comfort Food", "Adventurous"];
+      if (user) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          setUserProfile(profile);
 
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomBio = foodBios[Math.floor(Math.random() * foodBios.length)];
-    const randomFood =
-      favouriteFoods[Math.floor(Math.random() * favouriteFoods.length)];
-    const randomMood = moods[Math.floor(Math.random() * moods.length)];
+          if (profile?.username) {
+            setUsername(profile.username);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        setUserProfile(null);
+      }
 
-    const seed = `${randomName}-${randomFood}-${profileKey}-${Math.floor(
-      Math.random() * 10000
-    )}`;
-    const avatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(
-      seed
-    )}`;
+      setAuthLoading(false);
+    });
 
-    return {
-      id: seed,
-      name: randomName,
-      bio: randomBio,
-      food: randomFood,
-      mood: randomMood,
-      avatarUrl,
-    };
-  }, [profileKey]);
+    return () => unsubscribe();
+  }, []);
+
+  async function loadMatches() {
+    if (!currentUser) return;
+
+    try {
+      const userMatches = await getUserMatches(currentUser.uid);
+      setMatches(userMatches);
+      setMatchCount(userMatches.length);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function loadDatingProfiles() {
+    if (!currentUser) return;
+
+    try {
+      const profiles = await getAllProfilesExceptCurrentUser(currentUser.uid);
+      setAllDatingProfiles(profiles);
+      setDatingIndex(0);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    if (!currentUser) return;
+    loadDatingProfiles();
+    loadMatches();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!activeMatchId) return;
+
+    const unsubscribe = subscribeToMessages(activeMatchId, (msgs) => {
+      setMessages((prev) => ({
+        ...prev,
+        [activeMatchId]: msgs,
+      }));
+    });
+
+    return () => unsubscribe();
+  }, [activeMatchId]);
+
+  const matchedUserIds = useMemo(() => {
+    return matches.map((match) => match.uid);
+  }, [matches]);
+
+  const availableDatingProfiles = useMemo(() => {
+    return allDatingProfiles.filter((profile) => !matchedUserIds.includes(profile.uid));
+  }, [allDatingProfiles, matchedUserIds]);
+
+  const datingProfile =
+    availableDatingProfiles.length > 0
+      ? availableDatingProfiles[datingIndex % availableDatingProfiles.length]
+      : null;
 
   function generateRoomCode() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -136,7 +172,10 @@ function App() {
   }
 
   async function handleCreateRoom() {
-    if (username.trim() === "") {
+    const effectiveUsername =
+      username.trim() || userProfile?.username?.trim() || "";
+
+    if (effectiveUsername === "") {
       alert("Please enter your name first");
       return;
     }
@@ -148,7 +187,7 @@ function App() {
 
     try {
       const code = generateRoomCode();
-      const cleanName = username.trim();
+      const cleanName = effectiveUsername;
       const cleanLocation = location.trim();
 
       await createRoom(code, cleanLocation, cleanName);
@@ -161,6 +200,7 @@ function App() {
       listenToRoom(code);
       setDecideScreen("room");
       setActiveTab("decide");
+      setCurrentScreen("main");
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
@@ -168,14 +208,17 @@ function App() {
   }
 
   async function handleJoinRoom() {
-    if (username.trim() === "" || joinCode.trim() === "") {
+    const effectiveUsername =
+      username.trim() || userProfile?.username?.trim() || "";
+
+    if (effectiveUsername === "" || joinCode.trim() === "") {
       alert("Please enter your name and room code");
       return;
     }
 
     try {
       const cleanCode = joinCode.trim().toUpperCase();
-      const cleanName = username.trim();
+      const cleanName = effectiveUsername;
 
       await joinRoom(cleanCode, cleanName);
 
@@ -185,6 +228,7 @@ function App() {
       listenToRoom(cleanCode);
       setDecideScreen("room");
       setActiveTab("decide");
+      setCurrentScreen("main");
     } catch (error) {
       console.error(error);
       alert("Could not join room");
@@ -200,26 +244,15 @@ function App() {
     }
   }
 
-  function loadNextDatingProfile() {
-    setProfileKey((prev) => prev + 1);
+  function goNextDatingProfile() {
+    setDatingIndex((prev) => prev + 1);
     setSwipeDirection("");
   }
 
-  function openChat(profile) {
-    setSelectedChat(profile);
+  function openChat(match) {
+    setSelectedChat(match);
+    setActiveMatchId(match.id);
     setCurrentScreen("chat");
-
-    if (!messages[profile.id]) {
-      setMessages((prev) => ({
-        ...prev,
-        [profile.id]: [
-          {
-            sender: "them",
-            text: `Hey! I saw we both like ${profile.food}.`,
-          },
-        ],
-      }));
-    }
   }
 
   function handleDislike() {
@@ -227,64 +260,75 @@ function App() {
     setSwipeDirection("left");
 
     setTimeout(() => {
-      loadNextDatingProfile();
+      goNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 1800);
   }
 
-  function handleLike() {
+  async function handleLike() {
+    if (!datingProfile || !currentUser || !userProfile) return;
+
     const gotMatch = Math.random() < 0.4;
     setSwipeDirection("right");
 
     if (gotMatch) {
-      setMatchCount((prev) => prev + 1);
-      setMatchMessage(`It's a match with ${datingProfile.name}!`);
+      setMatchMessage(`It's a match with ${datingProfile.username}!`);
 
-      setMatches((prev) => {
-        const alreadyExists = prev.some((item) => item.id === datingProfile.id);
-        if (alreadyExists) return prev;
-        return [...prev, datingProfile];
-      });
+      try {
+        await createMatch(
+          {
+            uid: currentUser.uid,
+            username: userProfile.username || "",
+            photoURL: userProfile.photoURL || "",
+            favouriteFood: userProfile.favouriteFood || "",
+            cravingStyle: userProfile.cravingStyle || "",
+            bio: userProfile.bio || "",
+          },
+          {
+            uid: datingProfile.uid,
+            username: datingProfile.username || "",
+            photoURL: datingProfile.photoURL || "",
+            favouriteFood: datingProfile.favouriteFood || "",
+            cravingStyle: datingProfile.cravingStyle || "",
+            bio: datingProfile.bio || "",
+          }
+        );
 
-      setMessages((prev) => {
-        if (prev[datingProfile.id]) return prev;
-        return {
-          ...prev,
-          [datingProfile.id]: [
-            {
-              sender: "them",
-              text: `Hi! I also love ${datingProfile.food}.`,
-            },
-          ],
-        };
-      });
+        await loadMatches();
+      } catch (error) {
+        console.error(error);
+      }
     } else {
       setMatchMessage("Liked! No match this time.");
     }
 
     setTimeout(() => {
-      loadNextDatingProfile();
+      goNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 1800);
   }
 
-  function handleSendMessage() {
-    if (!chatInput.trim() || !selectedChat) return;
+  async function handleSendMessage() {
+    if (!chatInput.trim() || !activeMatchId || !currentUser) return;
 
-    setMessages((prev) => ({
-      ...prev,
-      [selectedChat.id]: [
-        ...(prev[selectedChat.id] || []),
-        { sender: "me", text: chatInput },
-      ],
-    }));
-
-    setChatInput("");
+    try {
+      await sendMessage(activeMatchId, currentUser.uid, chatInput.trim());
+      setChatInput("");
+    } catch (error) {
+      console.error(error);
+      alert("Could not send message");
+    }
   }
 
   function renderContent() {
     if (currentScreen === "matches") {
-      return <MatchesScreen matches={matches} openChat={openChat} />;
+      return (
+        <MatchesScreen
+          matches={matches}
+          openChat={openChat}
+          goBack={() => setCurrentScreen("main")}
+        />
+      );
     }
 
     if (currentScreen === "messages") {
@@ -293,6 +337,7 @@ function App() {
           matches={matches}
           messages={messages}
           openChat={openChat}
+          goBack={() => setCurrentScreen("main")}
         />
       );
     }
@@ -306,6 +351,7 @@ function App() {
           setChatInput={setChatInput}
           handleSendMessage={handleSendMessage}
           goBack={() => setCurrentScreen("messages")}
+          currentUser={currentUser}
         />
       );
     }
@@ -362,7 +408,38 @@ function App() {
       );
     }
 
-    return <ProfileScreen profileHover={profileHover} setProfileHover={setProfileHover} />;
+    return (
+      <ProfileScreen
+        currentUser={currentUser}
+        userProfile={userProfile}
+        setUserProfile={setUserProfile}
+        profileHover={profileHover}
+        setProfileHover={setProfileHover}
+      />
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#0d1b2a",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: "'Poppins', sans-serif",
+          color: "white",
+          fontSize: "22px",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <AppHomeScreen onAuthSuccess={setCurrentUser} />;
   }
 
   return (
@@ -380,6 +457,25 @@ function App() {
           onOpenMatches={() => setCurrentScreen("matches")}
           onOpenMessages={() => setCurrentScreen("messages")}
         />
+
+        <button
+          onClick={signOutUser}
+          style={{
+            position: "absolute",
+            top: "18px",
+            left: "18px",
+            zIndex: 5,
+            backgroundColor: "#4da8da",
+            color: "white",
+            border: "none",
+            borderRadius: "12px",
+            padding: "8px 12px",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          Sign Out
+        </button>
 
         {renderContent()}
 

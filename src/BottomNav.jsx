@@ -36,7 +36,6 @@ function BottomNav({
                 padding: "8px",
                 display: "flex",
                 gap: "8px",
-                zIndex: 3,
                 boxShadow: "0 6px 14px rgba(0,0,0,0.10)",
             }}
         >

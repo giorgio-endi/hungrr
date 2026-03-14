@@ -1,6 +1,20 @@
-function MessagesScreen({ matches, messages, openChat }) {
+function MessagesScreen({ matches, messages, openChat, goBack }) {
     return (
         <>
+            <button
+                onClick={goBack}
+                style={{
+                    border: "none",
+                    background: "transparent",
+                    fontSize: "22px",
+                    cursor: "pointer",
+                    color: "#1f5f8b",
+                    marginBottom: "10px",
+                }}
+            >
+                ← Back
+            </button>
+
             <h1>Messages</h1>
 
             {matches.length === 0 ? (
