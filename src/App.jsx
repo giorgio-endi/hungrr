@@ -64,6 +64,22 @@ function App() {
   const [allDatingProfiles, setAllDatingProfiles] = useState([]);
   const [datingIndex, setDatingIndex] = useState(0);
 
+  const [roomUnsubscribe, setRoomUnsubscribe] = useState(null);
+
+  function resetDecideFlow() {
+    if (roomUnsubscribe) {
+      roomUnsubscribe();
+      setRoomUnsubscribe(null);
+    }
+
+    setRoomCode("");
+    setJoinCode("");
+    setLocation("");
+    setRoomData(null);
+    setIsHost(false);
+    setDecideScreen("home");
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
@@ -75,12 +91,28 @@ function App() {
 
           if (profile?.username) {
             setUsername(profile.username);
+          } else {
+            setUsername("");
           }
         } catch (error) {
-          console.error(error);
+          console.error("getUserProfile error:", error);
         }
       } else {
         setUserProfile(null);
+        setUsername("");
+        resetDecideFlow();
+        setActiveTab("decide");
+        setCurrentScreen("main");
+        setSelectedChat(null);
+        setChatInput("");
+        setMessages({});
+        setMatches([]);
+        setMatchCount(0);
+        setActiveMatchId(null);
+        setMatchMessage("");
+        setSwipeDirection("");
+        setAllDatingProfiles([]);
+        setDatingIndex(0);
       }
 
       setAuthLoading(false);
@@ -90,19 +122,23 @@ function App() {
   }, []);
 
   async function loadMatches() {
-    if (!currentUser) return;
+    if (!currentUser) {
+      return;
+    }
 
     try {
       const userMatches = await getUserMatches(currentUser.uid);
       setMatches(userMatches);
       setMatchCount(userMatches.length);
     } catch (error) {
-      console.error(error);
+      console.error("loadMatches error:", error);
     }
   }
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      return;
+    }
 
     const unsubscribeProfiles = subscribeToProfilesExceptCurrentUser(
       currentUser.uid,
@@ -120,7 +156,9 @@ function App() {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!activeMatchId) return;
+    if (!activeMatchId) {
+      return;
+    }
 
     const unsubscribe = subscribeToMessages(activeMatchId, (msgs) => {
       setMessages((prev) => ({
@@ -151,7 +189,7 @@ function App() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i += 1) {
       const randomIndex = Math.floor(Math.random() * chars.length);
       code += chars[randomIndex];
     }
@@ -160,8 +198,14 @@ function App() {
   }
 
   function listenToRoom(code) {
-    subscribeToRoom(code, (data) => {
-      if (!data) return;
+    if (roomUnsubscribe) {
+      roomUnsubscribe();
+    }
+
+    const unsubscribe = subscribeToRoom(code, (data) => {
+      if (!data) {
+        return;
+      }
 
       setRoomData(data);
 
@@ -171,6 +215,8 @@ function App() {
         setDecideScreen("room");
       }
     });
+
+    setRoomUnsubscribe(() => unsubscribe);
   }
 
   async function handleCreateRoom() {
@@ -193,7 +239,6 @@ function App() {
       const cleanLocation = location.trim();
 
       await createRoom(code, cleanLocation, cleanName);
-      await joinRoom(code, cleanName);
 
       setRoomCode(code);
       setJoinCode(code);
@@ -204,8 +249,8 @@ function App() {
       setActiveTab("decide");
       setCurrentScreen("main");
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong");
+      console.error("handleCreateRoom error:", error);
+      alert(`Something went wrong: ${error.message}`);
     }
   }
 
@@ -232,8 +277,8 @@ function App() {
       setActiveTab("decide");
       setCurrentScreen("main");
     } catch (error) {
-      console.error(error);
-      alert("Could not join room");
+      console.error("handleJoinRoom error:", error);
+      alert(`Could not join room: ${error.message}`);
     }
   }
 
@@ -241,8 +286,8 @@ function App() {
     try {
       await startSwiping(roomCode);
     } catch (error) {
-      console.error(error);
-      alert("Could not start swiping");
+      console.error("handleStartSwiping error:", error);
+      alert(`Could not start swiping: ${error.message}`);
     }
   }
 
@@ -268,7 +313,9 @@ function App() {
   }
 
   async function handleLike() {
-    if (!datingProfile || !currentUser || !userProfile) return;
+    if (!datingProfile || !currentUser || !userProfile) {
+      return;
+    }
 
     const gotMatch = Math.random() < 0.4;
     setSwipeDirection("right");
@@ -298,7 +345,7 @@ function App() {
 
         await loadMatches();
       } catch (error) {
-        console.error(error);
+        console.error("handleLike error:", error);
       }
     } else {
       setMatchMessage("Liked! No match this time.");
@@ -311,14 +358,16 @@ function App() {
   }
 
   async function handleSendMessage() {
-    if (!chatInput.trim() || !activeMatchId || !currentUser) return;
+    if (!chatInput.trim() || !activeMatchId || !currentUser) {
+      return;
+    }
 
     try {
       await sendMessage(activeMatchId, currentUser.uid, chatInput.trim());
       setChatInput("");
     } catch (error) {
-      console.error(error);
-      alert("Could not send message");
+      console.error("handleSendMessage error:", error);
+      alert(`Could not send message: ${error.message}`);
     }
   }
 
@@ -387,12 +436,31 @@ function App() {
             hovered={hovered}
             setHovered={setHovered}
             onStartSwiping={handleStartSwiping}
+            goBack={resetDecideFlow}
           />
         );
       }
 
       if (decideScreen === "swipe") {
-        return <RestaurantSwipeScreen roomData={roomData} />;
+        return (
+          <>
+            <button
+              onClick={resetDecideFlow}
+              style={{
+                border: "none",
+                background: "transparent",
+                fontSize: "22px",
+                cursor: "pointer",
+                color: "#1f5f8b",
+                marginBottom: "10px",
+              }}
+            >
+              ← Back
+            </button>
+
+            <RestaurantSwipeScreen roomData={roomData} />
+          </>
+        );
       }
     }
 
@@ -461,7 +529,10 @@ function App() {
             />
 
             <button
-              onClick={signOutUser}
+              onClick={async () => {
+                resetDecideFlow();
+                await signOutUser();
+              }}
               style={{
                 position: "absolute",
                 top: "18px",

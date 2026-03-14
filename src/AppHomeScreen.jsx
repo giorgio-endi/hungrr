@@ -1,4 +1,3 @@
-// for hannah
 import { useState } from "react";
 import { signInUser, signUpUser } from "./firestore";
 
@@ -72,7 +71,7 @@ function AppHomeScreen({ onAuthSuccess }) {
             marginBottom: "28px",
           }}
         >
-          Taste & Decide
+          Your Go To Eating Out App!
         </p>
 
         <div
@@ -88,7 +87,7 @@ function AppHomeScreen({ onAuthSuccess }) {
             fontSize: "64px",
           }}
         >
-          🍽️
+          🥵
         </div>
 
         <h2 style={{ color: "#1f5f8b", marginBottom: "16px" }}>
@@ -97,7 +96,7 @@ function AppHomeScreen({ onAuthSuccess }) {
 
         <input
           type="text"
-          placeholder="Unique username"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           style={{

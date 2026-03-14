@@ -140,6 +140,18 @@ export async function saveUserProfile(uid, profileData) {
   );
 }
 
+// optional helper if you want to save a base64 image directly
+export async function saveProfilePictureBase64(uid, base64String) {
+  const profileRef = doc(db, "profiles", uid);
+
+  await updateDoc(profileRef, {
+    photoURL: base64String,
+    updatedAt: Date.now(),
+  });
+
+  return base64String;
+}
+
 // -------------------- REALTIME PROFILES --------------------
 
 export function subscribeToProfilesExceptCurrentUser(currentUid, callback) {

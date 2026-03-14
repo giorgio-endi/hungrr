@@ -16,7 +16,7 @@ export async function searchRestaurants(query) {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       "X-Goog-FieldMask":
-        "places.id,places.displayName,places.formattedAddress,places.rating,places.types",
+        "places.id,places.displayName,places.formattedAddress,places.rating,places.types,places.primaryType,places.priceLevel,places.photos",
     },
     body: JSON.stringify(body),
   });
