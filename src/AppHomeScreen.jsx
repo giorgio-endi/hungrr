@@ -57,7 +57,7 @@ function AppHomeScreen({ onAuthSuccess }) {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#0d1b2a",
+        backgroundColor: "#fff6c1",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -77,6 +77,21 @@ function AppHomeScreen({ onAuthSuccess }) {
           position: "relative",
         }}
       >
+
+        <div
+                    style={{
+                        position: "absolute",
+                        top: "12px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: "120px",
+                        height: "28px",
+                        backgroundColor: "black",
+                        borderRadius: "20px",
+                        zIndex: 10,
+                    }}
+                />
+                
         <h1
           style={{
             fontSize: "48px",
