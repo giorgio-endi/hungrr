@@ -24,7 +24,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
         setRestaurantIndex(0);
       } catch (error) {
         console.error(error);
-        setRestaurantsError("Could not load restaurants");
+        setRestaurantsError(error.message || "Could not load restaurants");
       } finally {
         setRestaurantsLoading(false);
       }
@@ -76,7 +76,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
         style={{
           fontSize: "16px",
           color: "#24506d",
-          marginBottom: "22px",
+          marginBottom: "18px",
         }}
       >
         Room location: {roomData?.location}
@@ -98,6 +98,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
           justifyContent: "center",
           gap: "16px",
           marginTop: "10px",
+          marginBottom: "120px",
         }}
       >
         <button
@@ -133,7 +134,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
         </button>
       </div>
 
-      <div style={{ height: "40px" }} />
+      <div style={{ height: "120px" }} />
     </>
   );
 }

@@ -7,25 +7,25 @@ function RestaurantCard({ restaurant }) {
     return (
       <div
         style={{
-          margin: "0 auto 24px auto",
-          width: "240px",
+          margin: "0 auto 18px auto",
+          width: "220px",
           backgroundColor: "white",
           borderRadius: "24px",
-          padding: "22px",
+          padding: "18px",
           boxShadow: "0 8px 16px rgba(0,0,0,0.10)",
         }}
       >
         <div
           style={{
             width: "100%",
-            height: "180px",
+            height: "140px",
             borderRadius: "18px",
             backgroundColor: "#dff2ff",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: "16px",
-            fontSize: "64px",
+            marginBottom: "12px",
+            fontSize: "56px",
             overflow: "hidden",
           }}
         >
@@ -46,9 +46,10 @@ function RestaurantCard({ restaurant }) {
   
         <h2
           style={{
-            fontSize: "24px",
+            fontSize: "20px",
             color: "#1f5f8b",
             margin: "0 0 8px 0",
+            lineHeight: "1.2",
           }}
         >
           {restaurant?.displayName?.text || "Unknown restaurant"}
@@ -56,9 +57,10 @@ function RestaurantCard({ restaurant }) {
   
         <p
           style={{
-            fontSize: "15px",
+            fontSize: "13px",
             color: "#335c74",
             margin: "0 0 6px 0",
+            lineHeight: "1.5",
           }}
         >
           {restaurant?.formattedAddress || "No address"}
@@ -66,7 +68,7 @@ function RestaurantCard({ restaurant }) {
   
         <p
           style={{
-            fontSize: "14px",
+            fontSize: "13px",
             color: "#335c74",
             margin: "0 0 6px 0",
           }}
@@ -76,7 +78,7 @@ function RestaurantCard({ restaurant }) {
   
         <p
           style={{
-            fontSize: "14px",
+            fontSize: "13px",
             color: "#335c74",
             margin: "0 0 6px 0",
           }}
@@ -86,7 +88,7 @@ function RestaurantCard({ restaurant }) {
   
         <p
           style={{
-            fontSize: "14px",
+            fontSize: "13px",
             color: "#335c74",
             margin: 0,
           }}
