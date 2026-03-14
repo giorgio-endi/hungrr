@@ -1,8 +1,9 @@
 function RestaurantCard({ restaurant }) {
-    const photoName = restaurant?.photos?.[0]?.name;
-    const photoUrl = photoName
-      ? `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=400&key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}`
-      : null;
+    const photos = restaurant?.photos || [];
+  
+    const photoUrls = photos.slice(0, 3).map((photo) => {
+      return `https://places.googleapis.com/v1/${photo.name}/media?maxHeightPx=400&key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}`;
+    });
   
     return (
       <div
@@ -18,29 +19,102 @@ function RestaurantCard({ restaurant }) {
         <div
           style={{
             width: "100%",
-            height: "140px",
-            borderRadius: "18px",
-            backgroundColor: "#dff2ff",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
             marginBottom: "12px",
-            fontSize: "56px",
-            overflow: "hidden",
           }}
         >
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={restaurant?.displayName?.text}
+          {photoUrls.length > 0 ? (
+            <>
+              <div
+                style={{
+                  width: "100%",
+                  height: "120px",
+                  borderRadius: "18px",
+                  overflow: "hidden",
+                  marginBottom: "8px",
+                  backgroundColor: "#dff2ff",
+                }}
+              >
+                <img
+                  src={photoUrls[0]}
+                  alt={restaurant?.displayName?.text}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+              </div>
+  
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                }}
+              >
+                {photoUrls[1] && (
+                  <div
+                    style={{
+                      flex: 1,
+                      height: "70px",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      backgroundColor: "#dff2ff",
+                    }}
+                  >
+                    <img
+                      src={photoUrls[1]}
+                      alt={`${restaurant?.displayName?.text} 2`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
+                )}
+  
+                {photoUrls[2] && (
+                  <div
+                    style={{
+                      flex: 1,
+                      height: "70px",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      backgroundColor: "#dff2ff",
+                    }}
+                  >
+                    <img
+                      src={photoUrls[2]}
+                      alt={`${restaurant?.displayName?.text} 3`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div
               style={{
                 width: "100%",
-                height: "100%",
-                objectFit: "cover",
+                height: "140px",
+                borderRadius: "18px",
+                backgroundColor: "#dff2ff",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: "56px",
+                overflow: "hidden",
               }}
-            />
-          ) : (
-            "🍜"
+            >
+              🍜
+            </div>
           )}
         </div>
   
