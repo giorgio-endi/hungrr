@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { saveUserProfile, uploadProfilePicture } from "./firestore";
 
-
 function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
   const [saving, setSaving] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
   const fileInputRef = useRef(null);
-
 
   const [formData, setFormData] = useState({
     username: "",
@@ -15,7 +14,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     bio: "",
     photoURL: "",
   });
-
 
   useEffect(() => {
     if (userProfile) {
@@ -27,9 +25,10 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
         bio: userProfile.bio || "",
         photoURL: userProfile.photoURL || "",
       });
+
+      setPreviewImage(userProfile.photoURL || "");
     }
   }, [userProfile]);
-
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -39,20 +38,16 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     }));
   }
 
-
   async function handleSaveProfile() {
     if (!currentUser) return;
 
-
     try {
       setSaving(true);
-
 
       const updatedProfile = {
         ...formData,
         uid: currentUser.uid,
       };
-
 
       await saveUserProfile(currentUser.uid, updatedProfile);
       setUserProfile(updatedProfile);
@@ -65,52 +60,50 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     }
   }
 
-
   async function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file || !currentUser) return;
 
+    const localPreview = URL.createObjectURL(file);
+    setPreviewImage(localPreview);
 
     try {
       setSaving(true);
 
-
       const imageUrl = await uploadProfilePicture(currentUser.uid, file);
-
 
       const updatedData = {
         ...formData,
         photoURL: imageUrl,
       };
 
-
       setFormData(updatedData);
+      setPreviewImage(imageUrl);
+
       setUserProfile((prev) => ({
         ...(prev || {}),
         ...updatedData,
       }));
-
 
       await saveUserProfile(currentUser.uid, {
         ...updatedData,
         uid: currentUser.uid,
       });
 
-
       alert("Profile picture uploaded!");
     } catch (error) {
-      console.error(error);
+      console.error("Upload error:", error);
       alert("Could not upload profile picture.");
     } finally {
       setSaving(false);
     }
   }
 
+  const displayImage = previewImage || formData.photoURL;
 
   return (
     <>
       <h1>Your Profile</h1>
-
 
       <div
         style={{
@@ -125,9 +118,9 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           overflow: "hidden",
         }}
       >
-        {formData.photoURL ? (
+        {displayImage ? (
           <img
-            src={formData.photoURL}
+            src={displayImage}
             alt="Profile"
             style={{
               width: "100%",
@@ -140,7 +133,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
         )}
       </div>
 
-
       <input
         ref={fileInputRef}
         type="file"
@@ -148,7 +140,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
         onChange={handleFileChange}
         style={{ display: "none" }}
       />
-
 
       <button
         onClick={() => fileInputRef.current.click()}
@@ -164,9 +155,8 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           marginBottom: "18px",
         }}
       >
-        Add Profile Picture
+        {saving ? "Uploading..." : "Add Profile Picture"}
       </button>
-
 
       <div
         style={{
@@ -186,7 +176,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
         />
 
-
         <p><strong>Favourite food</strong></p>
         <input
           name="favouriteFood"
@@ -194,7 +183,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           onChange={handleChange}
           style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
         />
-
 
         <p><strong>Craving style</strong></p>
         <input
@@ -204,7 +192,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
         />
 
-
         <p><strong>Budget</strong></p>
         <input
           name="budget"
@@ -212,7 +199,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           onChange={handleChange}
           style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
         />
-
 
         <p><strong>Bio</strong></p>
         <textarea
@@ -222,7 +208,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           rows="4"
           style={{ width: "100%", marginBottom: "14px", padding: "8px" }}
         />
-
 
         <button
           onClick={handleSaveProfile}
@@ -245,6 +230,4 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
   );
 }
 
-
 export default ProfileScreen;
-
