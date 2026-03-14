@@ -1,3 +1,6 @@
+import { FaHeart } from "react-icons/fa"; 
+import { MdMessage } from "react-icons/md";
+
 function TopRightIcons({
     activeTab,
     matchCount,
@@ -12,7 +15,7 @@ function TopRightIcons({
         <div
             style={{
                 position: "absolute",
-                top: "18px",
+                top: "50px",
                 right: "18px",
                 zIndex: 5,
                 display: "flex",
@@ -30,7 +33,7 @@ function TopRightIcons({
                     fontSize: "26px",
                 }}
             >
-                💙
+                <FaHeart size={30} color="020100" />
                 <span
                     style={{
                         position: "absolute",
@@ -39,7 +42,7 @@ function TopRightIcons({
                         minWidth: "20px",
                         height: "20px",
                         borderRadius: "50%",
-                        backgroundColor: "#2f7fb5",
+                        backgroundColor: "#991c1a",
                         color: "white",
                         fontSize: "11px",
                         fontWeight: "700",
@@ -63,7 +66,7 @@ function TopRightIcons({
                     fontSize: "24px",
                 }}
             >
-                💬
+                <MdMessage size={30} color="020100" />
             </button>
         </div>
     );

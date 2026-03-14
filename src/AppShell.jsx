@@ -2,7 +2,7 @@ function AppShell({ topRight, content, bottomNav }) {
     return (
         <div
             style={{
-                backgroundColor: "#fff6c1",
+                backgroundColor: "#991c1a",
                 minHeight: "100vh",
                 display: "flex",
                 justifyContent: "center",

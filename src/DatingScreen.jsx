@@ -19,7 +19,7 @@ function DatingScreen({
     padding: "14px 18px",
     borderRadius: "16px",
     border: "none",
-    backgroundColor: profileHover === type ? "#2f7fb5" : "#4da8da",
+    backgroundColor: profileHover === type ? "#781715" : "#991c1a",
     color: "white",
     fontWeight: "600",
     fontSize: "16px",
@@ -34,7 +34,7 @@ function DatingScreen({
         <h1
           style={{
             fontSize: "42px",
-            color: "#1f5f8b",
+            color: "#020100",
             fontWeight: "700",
             marginBottom: "6px",
           }}
@@ -57,34 +57,25 @@ function DatingScreen({
 
   return (
     <>
+
       <h1
         style={{
-          fontSize: "42px",
-          color: "#1f5f8b",
-          fontWeight: "700",
-          marginBottom: "6px",
-        }}
-      >
-        HUNGRR Match
-      </h1>
-
-      <p
-        style={{
-          fontSize: "18px",
-          color: "#24506d",
+          fontSize: "25px",
+          color: "#002010",
           marginBottom: "22px",
+          marginTop: "30px",
         }}
       >
-        Taste & Connect
-      </p>
+        Find Your Munch Buddy!
+      </h1>
 
       <div
         style={{
-          margin: "0 auto 20px auto",
+          margin: "auto ",
           width: "255px",
           backgroundColor: "white",
           borderRadius: "24px",
-          padding: "22px",
+          padding: "10px",
           boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
           transform: datingCardTransform,
           transition: "transform 0.35s ease, opacity 0.35s ease",
@@ -94,9 +85,9 @@ function DatingScreen({
         <div
           style={{
             width: "100%",
-            height: "190px",
+            height: "150px",
             borderRadius: "18px",
-            backgroundColor: "#dff2ff",
+            backgroundColor: "#f4f8f9",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -123,7 +114,7 @@ function DatingScreen({
         <h2
           style={{
             fontSize: "28px",
-            color: "#1f5f8b",
+            color: "#991c1a",
             marginBottom: "8px",
           }}
         >
@@ -143,7 +134,7 @@ function DatingScreen({
 
         <div
           style={{
-            backgroundColor: "#f3fbff",
+            backgroundColor: "#dff2ff",
             borderRadius: "16px",
             padding: "14px",
             textAlign: "left",
@@ -152,7 +143,7 @@ function DatingScreen({
           <p
             style={{
               margin: "0 0 8px 0",
-              color: "#1f5f8b",
+              color: "#020100",
               fontSize: "14px",
             }}
           >
@@ -162,7 +153,7 @@ function DatingScreen({
           <p
             style={{
               margin: 0,
-              color: "#1f5f8b",
+              color: "#020100",
               fontSize: "14px",
             }}
           >
@@ -175,7 +166,7 @@ function DatingScreen({
         {matchMessage && (
           <p
             style={{
-              color: "#1f5f8b",
+              color: "#991c1a",
               fontWeight: "600",
               fontSize: "16px",
               margin: 0,

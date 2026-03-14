@@ -6,7 +6,7 @@ function AppHomeScreen({ onAuthSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
-  const [hovered, setHovered] = useState(null); // <-- same pattern
+  const [hovered, setHovered] = useState(null); 
 
   const inputStyle = {
     width: "100%",
@@ -57,7 +57,7 @@ function AppHomeScreen({ onAuthSuccess }) {
     <div
       style={{
         minHeight: "100vh",
-        backgroundColor: "#fff6c1",
+        backgroundColor: "#991c1a",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
