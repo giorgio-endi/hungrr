@@ -309,7 +309,7 @@ function App() {
     setTimeout(() => {
       goNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 400);
   }
 
   async function handleLike() {
@@ -354,7 +354,7 @@ function App() {
     setTimeout(() => {
       goNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 400);
   }
 
   async function handleSendMessage() {
@@ -527,28 +527,6 @@ function App() {
               onOpenMatches={() => setCurrentScreen("matches")}
               onOpenMessages={() => setCurrentScreen("messages")}
             />
-
-            <button
-              onClick={async () => {
-                resetDecideFlow();
-                await signOutUser();
-              }}
-              style={{
-                position: "absolute",
-                top: "18px",
-                left: "18px",
-                zIndex: 5,
-                backgroundColor: "#e63946",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                padding: "8px 12px",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              Sign Out
-            </button>
           </>
         }
         content={renderContent()}

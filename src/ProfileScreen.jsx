@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { saveUserProfile } from "./firestore";
+import { saveUserProfile, signOutUser } from "./firestore";
 
 function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
   const [saving, setSaving] = useState(false);
@@ -254,6 +254,23 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           }}
         >
           {saving ? "Saving..." : "Save Profile"}
+        </button>
+
+        <button
+          onClick={signOutUser}
+          style={{
+            width: "100%",
+            margin: "17px auto",
+            padding: "12px",
+            backgroundColor: "#e63946",
+            color: "white",
+            border: "none",
+            borderRadius: "12px",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          Sign Out
         </button>
       </div>
     </>
