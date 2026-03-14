@@ -1,10 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createRoom,
   joinRoom,
   subscribeToRoom,
   startSwiping,
 } from "./firestore";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { getUserProfile, signOutUser } from "./firestore";
+import AppHomeScreen from "./AppHomeScreen";
 
 import AppShell from "./AppShell";
 import BottomNav from "./BottomNav";
@@ -45,6 +49,11 @@ function App() {
   const [isHost, setIsHost] = useState(false);
   const [roomData, setRoomData] = useState(null);
   const [decideScreen, setDecideScreen] = useState("home");
+
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
 
   const datingProfile = useMemo(() => {
     const names = [
@@ -362,7 +371,12 @@ function App() {
       );
     }
 
-    return <ProfileScreen profileHover={profileHover} setProfileHover={setProfileHover} />;
+    return <ProfileScreen currentUser={currentUser}
+    userProfile={userProfile}
+    setUserProfile={setUserProfile}
+    profileHover={profileHover}
+    setProfileHover={setProfileHover
+    } />;
   }
 
   return (
