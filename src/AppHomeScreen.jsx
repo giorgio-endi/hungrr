@@ -6,24 +6,46 @@ function AppHomeScreen({ onAuthSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [hovered, setHovered] = useState(null); // <-- same pattern
+
+  const inputStyle = {
+    width: "100%",
+    padding: "14px",
+    borderRadius: "7px",
+    border: "none",
+    outline: "none",
+    fontSize: "15px",
+    marginTop: "5px",
+    marginBottom: "10px",
+    boxSizing: "border-box",
+    color: "#000000",
+    backgroundColor: "#fdd0cd",
+  };
+
+  const mainButtonStyle = (name) => ({
+    width: "100%",
+    padding: "14px",
+    borderRadius: "14px",
+    border: "none",
+    backgroundColor: hovered === name ? "#781715" : "#991c1a",
+    color: "white",
+    fontWeight: "600",
+    fontSize: "18px",
+    cursor: "pointer",
+    marginBottom: "12px",
+    transition: "0.25s",
+  });
 
   async function handleSubmit() {
     setAuthError("");
-
     if (username.trim() === "" || password.trim() === "") {
       setAuthError("Please enter both username and password.");
       return;
     }
-
     try {
       let user;
-
-      if (isSignUp) {
-        user = await signUpUser(username, password);
-      } else {
-        user = await signInUser(username, password);
-      }
-
+      if (isSignUp) user = await signUpUser(username, password);
+      else user = await signInUser(username, password);
       onAuthSuccess(user);
     } catch (error) {
       console.error(error);
@@ -45,19 +67,22 @@ function AppHomeScreen({ onAuthSuccess }) {
       <div
         style={{
           width: "380px",
-          backgroundColor: "#8ed6ff",
+          height: "720px",
+          backgroundColor: "#f4f8f9",
           border: "10px solid black",
           borderRadius: "40px",
           padding: "50px 30px",
           textAlign: "center",
           boxSizing: "border-box",
+          position: "relative",
         }}
       >
         <h1
           style={{
             fontSize: "48px",
-            color: "#1f5f8b",
-            marginBottom: "8px",
+            color: "#020100",
+            marginTop: "40px",
+            marginBottom: "20px",
             fontWeight: "700",
           }}
         >
@@ -66,20 +91,20 @@ function AppHomeScreen({ onAuthSuccess }) {
 
         <p
           style={{
-            color: "#24506d",
+            color: "#020100",
             fontSize: "20px",
             marginBottom: "28px",
           }}
         >
-          Your Go To Eating Out App!
+          Swipe, Match, Eat!
         </p>
 
         <div
           style={{
-            width: "140px",
-            height: "140px",
+            width: "150px",
+            height: "150px",
             borderRadius: "50%",
-            backgroundColor: "#5bb8eb",
+            backgroundColor: "#f4f8f9",
             margin: "0 auto 28px auto",
             display: "flex",
             justifyContent: "center",
@@ -87,10 +112,19 @@ function AppHomeScreen({ onAuthSuccess }) {
             fontSize: "64px",
           }}
         >
-          🥵
+          <img
+            src="src/assets/logo.png"
+            alt="Logo"
+            style={{
+              paddingTop: "20px",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
         </div>
 
-        <h2 style={{ color: "#1f5f8b", marginBottom: "16px" }}>
+        <h2 style={{ color: "#991c1a", marginBottom: "16px" }}>
           {isSignUp ? "Sign Up" : "Sign In"}
         </h2>
 
@@ -99,29 +133,14 @@ function AppHomeScreen({ onAuthSuccess }) {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "14px",
-            border: "none",
-            marginBottom: "12px",
-            boxSizing: "border-box",
-          }}
+          style={inputStyle}
         />
-
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "14px",
-            border: "none",
-            marginBottom: "16px",
-            boxSizing: "border-box",
-          }}
+          style={inputStyle}
         />
 
         {authError && (
@@ -132,18 +151,9 @@ function AppHomeScreen({ onAuthSuccess }) {
 
         <button
           onClick={handleSubmit}
-          style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "14px",
-            border: "none",
-            backgroundColor: "#4da8da",
-            color: "white",
-            fontWeight: "600",
-            fontSize: "18px",
-            cursor: "pointer",
-            marginBottom: "12px",
-          }}
+          onMouseEnter={() => setHovered("create")}
+          onMouseLeave={() => setHovered(null)}
+          style={mainButtonStyle("create")}
         >
           {isSignUp ? "Create Account" : "Login"}
         </button>
@@ -153,14 +163,12 @@ function AppHomeScreen({ onAuthSuccess }) {
           style={{
             background: "transparent",
             border: "none",
-            color: "#1f5f8b",
+            color: "#991c1a",
             cursor: "pointer",
             fontWeight: "600",
           }}
         >
-          {isSignUp
-            ? "Already have an account? Sign In"
-            : "Need an account? Sign Up"}
+          {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
         </button>
       </div>
     </div>

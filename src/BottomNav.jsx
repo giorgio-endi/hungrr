@@ -72,7 +72,7 @@ function BottomNav({
                     }}
                 >
                     <FaHeart size={20} />
-                    <span>Dating</span>
+                    <span>Connect</span>
                 </div>
             </button>
 

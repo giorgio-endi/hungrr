@@ -35,7 +35,7 @@ function AppShell({ topRight, content, bottomNav }) {
                         zIndex: 10,
                     }}
                 />
-                
+
                 {topRight}
 
                 <div
