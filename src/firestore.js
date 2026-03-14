@@ -6,6 +6,11 @@ import {
   updateDoc,
   onSnapshot,
   arrayUnion,
+  collection,
+  getDocs,
+  addDoc,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
@@ -83,7 +88,7 @@ export async function saveVote(roomCode, restaurantId, username, vote) {
 
 // -------------------- AUTH + PROFILE FUNCTIONS --------------------
 
-// demo helper: turn username into login email
+// convert username to email for Firebase Auth
 function usernameToEmail(username) {
   return `${username.trim().toLowerCase()}@hungrr.app`;
 }
@@ -147,7 +152,7 @@ export async function saveUserProfile(uid, profileData) {
 }
 
 export async function uploadProfilePicture(uid, file) {
-  const storageRef = ref(storage, `profilePictures/${uid}/${file.name}`);
+  const storageRef = ref(storage, `profilePictures/${uid}/${Date.now()}-${file.name}`);
   await uploadBytes(storageRef, file);
   const downloadURL = await getDownloadURL(storageRef);
 
@@ -157,4 +162,111 @@ export async function uploadProfilePicture(uid, file) {
   });
 
   return downloadURL;
+}
+
+// -------------------- DATING / MATCHES FUNCTIONS --------------------
+
+export async function getAllProfilesExceptCurrentUser(currentUid) {
+  const profilesRef = collection(db, "profiles");
+  const snapshot = await getDocs(profilesRef);
+
+  const profiles = [];
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    if (data.uid !== currentUid) {
+      profiles.push(data);
+    }
+  });
+
+  return profiles;
+}
+
+export async function createMatch(currentUserProfile, otherUserProfile) {
+  const matchId = [currentUserProfile.uid, otherUserProfile.uid].sort().join("_");
+
+  await setDoc(
+    doc(db, "matches", matchId),
+    {
+      id: matchId,
+      userIds: [currentUserProfile.uid, otherUserProfile.uid],
+      users: {
+        [currentUserProfile.uid]: {
+          uid: currentUserProfile.uid,
+          username: currentUserProfile.username || "",
+          photoURL: currentUserProfile.photoURL || "",
+          favouriteFood: currentUserProfile.favouriteFood || "",
+          cravingStyle: currentUserProfile.cravingStyle || "",
+          bio: currentUserProfile.bio || "",
+        },
+        [otherUserProfile.uid]: {
+          uid: otherUserProfile.uid,
+          username: otherUserProfile.username || "",
+          photoURL: otherUserProfile.photoURL || "",
+          favouriteFood: otherUserProfile.favouriteFood || "",
+          cravingStyle: otherUserProfile.cravingStyle || "",
+          bio: otherUserProfile.bio || "",
+        },
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    { merge: true }
+  );
+
+  return matchId;
+}
+
+export async function getUserMatches(currentUid) {
+  const matchesRef = collection(db, "matches");
+  const snapshot = await getDocs(matchesRef);
+
+  const results = [];
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    if (!data.userIds?.includes(currentUid)) {
+      return;
+    }
+
+    const otherUid = data.userIds.find((uid) => uid !== currentUid);
+    const otherUser = data.users?.[otherUid];
+
+    if (otherUser) {
+      results.push({
+        id: data.id,
+        ...otherUser,
+      });
+    }
+  });
+
+  return results;
+}
+
+export async function sendMessage(matchId, senderUid, text) {
+  const messagesRef = collection(db, "matches", matchId, "messages");
+
+  await addDoc(messagesRef, {
+    senderUid,
+    text,
+    createdAt: Date.now(),
+  });
+
+  await updateDoc(doc(db, "matches", matchId), {
+    updatedAt: Date.now(),
+  });
+}
+
+export function subscribeToMessages(matchId, callback) {
+  const messagesRef = collection(db, "matches", matchId, "messages");
+  const q = query(messagesRef, orderBy("createdAt", "asc"));
+
+  return onSnapshot(q, (snapshot) => {
+    const msgs = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }));
+    callback(msgs);
+  });
 }
