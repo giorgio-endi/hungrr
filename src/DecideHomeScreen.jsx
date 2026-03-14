@@ -62,10 +62,9 @@ function DecideHomeScreen({
 
     return (
         <>
-
-            <h1>
-                Taste & Decide
-            </h1>
+        <h1>
+            Taste & Decide
+        </h1>
 
         <div style={formBoxStyle}>
 
