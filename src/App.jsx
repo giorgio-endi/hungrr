@@ -443,23 +443,10 @@ function App() {
 
       if (decideScreen === "swipe") {
         return (
-          <>
-            <button
-              onClick={resetDecideFlow}
-              style={{
-                border: "none",
-                background: "transparent",
-                fontSize: "22px",
-                cursor: "pointer",
-                color: "#1f5f8b",
-                marginBottom: "10px",
-              }}
-            >
-              ← Back
-            </button>
-
-            <RestaurantSwipeScreen roomData={roomData} />
-          </>
+          <RestaurantSwipeScreen
+            roomData={roomData}
+            goBack={resetDecideFlow}
+          />
         );
       }
     }
@@ -520,14 +507,12 @@ function App() {
 
       <AppShell
         topRight={
-          <>
-            <TopRightIcons
-              activeTab={activeTab}
-              matchCount={matchCount}
-              onOpenMatches={() => setCurrentScreen("matches")}
-              onOpenMessages={() => setCurrentScreen("messages")}
-            />
-          </>
+          <TopRightIcons
+            activeTab={activeTab}
+            matchCount={matchCount}
+            onOpenMatches={() => setCurrentScreen("matches")}
+            onOpenMessages={() => setCurrentScreen("messages")}
+          />
         }
         content={renderContent()}
         bottomNav={
