@@ -4,10 +4,12 @@ import {
   joinRoom,
   subscribeToRoom,
   startSwiping,
+  getUserProfile,
+  signOutUser,
 } from "./firestore";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { getUserProfile, signOutUser } from "./firestore";
+
 import AppHomeScreen from "./AppHomeScreen";
 
 import AppShell from "./AppShell";
@@ -54,6 +56,29 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+
+      if (user) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          setUserProfile(profile);
+          if (profile?.username) {
+            setUsername(profile.username);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        setUserProfile(null);
+      }
+
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const datingProfile = useMemo(() => {
     const names = [
@@ -145,7 +170,10 @@ function App() {
   }
 
   async function handleCreateRoom() {
-    if (username.trim() === "") {
+    const effectiveUsername =
+      username.trim() || userProfile?.username?.trim() || "";
+
+    if (effectiveUsername === "") {
       alert("Please enter your name first");
       return;
     }
@@ -157,7 +185,7 @@ function App() {
 
     try {
       const code = generateRoomCode();
-      const cleanName = username.trim();
+      const cleanName = effectiveUsername;
       const cleanLocation = location.trim();
 
       await createRoom(code, cleanLocation, cleanName);
@@ -170,6 +198,7 @@ function App() {
       listenToRoom(code);
       setDecideScreen("room");
       setActiveTab("decide");
+      setCurrentScreen("main");
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
@@ -177,14 +206,17 @@ function App() {
   }
 
   async function handleJoinRoom() {
-    if (username.trim() === "" || joinCode.trim() === "") {
+    const effectiveUsername =
+      username.trim() || userProfile?.username?.trim() || "";
+
+    if (effectiveUsername === "" || joinCode.trim() === "") {
       alert("Please enter your name and room code");
       return;
     }
 
     try {
       const cleanCode = joinCode.trim().toUpperCase();
-      const cleanName = username.trim();
+      const cleanName = effectiveUsername;
 
       await joinRoom(cleanCode, cleanName);
 
@@ -194,6 +226,7 @@ function App() {
       listenToRoom(cleanCode);
       setDecideScreen("room");
       setActiveTab("decide");
+      setCurrentScreen("main");
     } catch (error) {
       console.error(error);
       alert("Could not join room");
@@ -238,7 +271,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 1800);
   }
 
   function handleLike() {
@@ -274,7 +307,7 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 1800);
   }
 
   function handleSendMessage() {
@@ -371,12 +404,38 @@ function App() {
       );
     }
 
-    return <ProfileScreen currentUser={currentUser}
-    userProfile={userProfile}
-    setUserProfile={setUserProfile}
-    profileHover={profileHover}
-    setProfileHover={setProfileHover
-    } />;
+    return (
+      <ProfileScreen
+        currentUser={currentUser}
+        userProfile={userProfile}
+        setUserProfile={setUserProfile}
+        profileHover={profileHover}
+        setProfileHover={setProfileHover}
+      />
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#0d1b2a",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: "'Poppins', sans-serif",
+          color: "white",
+          fontSize: "22px",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <AppHomeScreen onAuthSuccess={setCurrentUser} />;
   }
 
   return (
@@ -394,6 +453,25 @@ function App() {
           onOpenMatches={() => setCurrentScreen("matches")}
           onOpenMessages={() => setCurrentScreen("messages")}
         />
+
+        <button
+          onClick={signOutUser}
+          style={{
+            position: "absolute",
+            top: "18px",
+            left: "18px",
+            zIndex: 5,
+            backgroundColor: "#4da8da",
+            color: "white",
+            border: "none",
+            borderRadius: "12px",
+            padding: "8px 12px",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          Sign Out
+        </button>
 
         {renderContent()}
 
