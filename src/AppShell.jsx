@@ -7,7 +7,6 @@ function AppShell({ topRight, content, bottomNav }) {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                fontFamily: "'Poppins', sans-serif",
             }}
         >
             <div
@@ -22,6 +21,21 @@ function AppShell({ topRight, content, bottomNav }) {
                     boxSizing: "border-box",
                 }}
             >
+
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "12px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: "120px",
+                        height: "28px",
+                        backgroundColor: "black",
+                        borderRadius: "20px",
+                        zIndex: 10,
+                    }}
+                />
+                
                 {topRight}
 
                 <div
