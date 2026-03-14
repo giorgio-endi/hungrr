@@ -6,11 +6,11 @@ import {
   startSwiping,
   getUserProfile,
   signOutUser,
-  getAllProfilesExceptCurrentUser,
   getUserMatches,
   createMatch,
   sendMessage,
   subscribeToMessages,
+  subscribeToProfilesExceptCurrentUser,
 } from "./firestore";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -101,22 +101,22 @@ function App() {
     }
   }
 
-  async function loadDatingProfiles() {
-    if (!currentUser) return;
-
-    try {
-      const profiles = await getAllProfilesExceptCurrentUser(currentUser.uid);
-      setAllDatingProfiles(profiles);
-      setDatingIndex(0);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   useEffect(() => {
     if (!currentUser) return;
-    loadDatingProfiles();
+
+    const unsubscribeProfiles = subscribeToProfilesExceptCurrentUser(
+      currentUser.uid,
+      (profiles) => {
+        setAllDatingProfiles(profiles);
+        setDatingIndex(0);
+      }
+    );
+
     loadMatches();
+
+    return () => {
+      unsubscribeProfiles();
+    };
   }, [currentUser]);
 
   useEffect(() => {
@@ -415,8 +415,6 @@ function App() {
         currentUser={currentUser}
         userProfile={userProfile}
         setUserProfile={setUserProfile}
-        profileHover={profileHover}
-        setProfileHover={setProfileHover}
       />
     );
   }

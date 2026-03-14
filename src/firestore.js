@@ -88,7 +88,6 @@ export async function saveVote(roomCode, restaurantId, username, vote) {
 
 // -------------------- AUTH + PROFILE FUNCTIONS --------------------
 
-// convert username to email for Firebase Auth
 function usernameToEmail(username) {
   return `${username.trim().toLowerCase()}@hungrr.app`;
 }
@@ -152,7 +151,11 @@ export async function saveUserProfile(uid, profileData) {
 }
 
 export async function uploadProfilePicture(uid, file) {
-  const storageRef = ref(storage, `profilePictures/${uid}/${Date.now()}-${file.name}`);
+  const storageRef = ref(
+    storage,
+    `profilePictures/${uid}/${Date.now()}-${file.name}`
+  );
+
   await uploadBytes(storageRef, file);
   const downloadURL = await getDownloadURL(storageRef);
 
@@ -164,23 +167,27 @@ export async function uploadProfilePicture(uid, file) {
   return downloadURL;
 }
 
-// -------------------- DATING / MATCHES FUNCTIONS --------------------
+// -------------------- REALTIME PROFILES --------------------
 
-export async function getAllProfilesExceptCurrentUser(currentUid) {
+export function subscribeToProfilesExceptCurrentUser(currentUid, callback) {
   const profilesRef = collection(db, "profiles");
-  const snapshot = await getDocs(profilesRef);
 
-  const profiles = [];
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
+  return onSnapshot(profilesRef, (snapshot) => {
+    const profiles = [];
 
-    if (data.uid !== currentUid) {
-      profiles.push(data);
-    }
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      if (data.uid !== currentUid) {
+        profiles.push(data);
+      }
+    });
+
+    callback(profiles);
   });
-
-  return profiles;
 }
+
+// -------------------- DATING / MATCHES --------------------
 
 export async function createMatch(currentUserProfile, otherUserProfile) {
   const matchId = [currentUserProfile.uid, otherUserProfile.uid].sort().join("_");
@@ -270,3 +277,4 @@ export function subscribeToMessages(matchId, callback) {
     callback(msgs);
   });
 }
+

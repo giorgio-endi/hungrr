@@ -25,7 +25,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
         bio: userProfile.bio || "",
         photoURL: userProfile.photoURL || "",
       });
-
       setPreviewImage(userProfile.photoURL || "");
     }
   }, [userProfile]);
@@ -36,6 +35,64 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
       ...prev,
       [name]: value,
     }));
+  }
+
+  function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        img.src = event.target.result;
+      };
+
+      reader.onerror = reject;
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxSize = 600;
+
+        let { width, height } = img;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Image compression failed"));
+              return;
+            }
+
+            const compressedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+            });
+
+            resolve(compressedFile);
+          },
+          "image/jpeg",
+          0.75
+        );
+      };
+
+      img.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   async function handleSaveProfile() {
@@ -70,7 +127,8 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     try {
       setSaving(true);
 
-      const imageUrl = await uploadProfilePicture(currentUser.uid, file);
+      const smallerFile = await resizeImage(file);
+      const imageUrl = await uploadProfilePicture(currentUser.uid, smallerFile);
 
       const updatedData = {
         ...formData,
@@ -231,3 +289,4 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
 }
 
 export default ProfileScreen;
+
