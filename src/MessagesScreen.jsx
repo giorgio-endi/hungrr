@@ -16,7 +16,11 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
       </button>
 
 
-      <h1>Messages</h1>
+      <div style = {{
+        marginBottom: "25px"
+      }}>
+        <h1>Messages</h1>
+      </div>
 
 
       {matches.length === 0 ? (

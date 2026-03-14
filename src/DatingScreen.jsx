@@ -1,3 +1,4 @@
+import { FaUser } from "react-icons/fa";
 function DatingScreen({
   datingProfile,
   matchMessage,
@@ -20,7 +21,7 @@ function DatingScreen({
     borderRadius: "16px",
     border: "none",
     backgroundColor: profileHover === type ? "#781715" : "#991c1a",
-    color: "white",
+    color: "#f4f8f9",
     fontWeight: "600",
     fontSize: "16px",
     cursor: "pointer",
@@ -32,24 +33,24 @@ function DatingScreen({
     return (
       <>
         <h1
-          style={{
-            fontSize: "42px",
-            color: "#020100",
-            fontWeight: "700",
-            marginBottom: "6px",
-          }}
+        style={{
+          fontSize: "25px",
+          color: "#002010",
+          marginBottom: "22px",
+          marginTop: "200px",
+        }}
         >
-          HUNGRR Match
+        You have seen everyone!
         </h1>
 
         <p
           style={{
             fontSize: "18px",
-            color: "#24506d",
+            color: "#020100",
             marginBottom: "22px",
           }}
         >
-          No more users to swipe right now.
+          No more users to swipe right now..
         </p>
       </>
     );
@@ -68,6 +69,8 @@ function DatingScreen({
       >
         Find Your Munch Buddy!
       </h1>
+
+      
 
       <div
         style={{
@@ -107,7 +110,7 @@ function DatingScreen({
               }}
             />
           ) : (
-            <span style={{ fontSize: "72px" }}>👤</span>
+            <span style={{ fontSize: "72px" }}><FaUser color="#020100"></FaUser></span>
           )}
         </div>
 
@@ -124,7 +127,7 @@ function DatingScreen({
         <p
           style={{
             fontSize: "15px",
-            color: "#24506d",
+            color: "#020100",
             marginBottom: "10px",
             lineHeight: "1.5",
           }}
@@ -134,7 +137,7 @@ function DatingScreen({
 
         <div
           style={{
-            backgroundColor: "#dff2ff",
+            backgroundColor: "white",
             borderRadius: "16px",
             padding: "14px",
             textAlign: "left",

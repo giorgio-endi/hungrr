@@ -15,12 +15,17 @@ function TopRightIcons({
         <div
             style={{
                 position: "absolute",
-                top: "50px",
-                right: "18px",
-                zIndex: 5,
+                top: 0,
+                left: 0,
+                width: "100%",       
+                height: "90px",     
+                backgroundColor: "#f4f8f9", 
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
+                justifyContent: "flex-end",
+                padding: "45px 12px 0px 0px",
+                boxSizing: "border-box",
+                zIndex: 3,
             }}
         >
             <button
@@ -30,10 +35,10 @@ function TopRightIcons({
                     border: "none",
                     cursor: "pointer",
                     position: "relative",
-                    fontSize: "26px",
+                    marginRight: "12px",
                 }}
             >
-                <FaHeart size={30} color="020100" />
+                <FaHeart size={30} color="#020100" />
                 <span
                     style={{
                         position: "absolute",
@@ -63,10 +68,9 @@ function TopRightIcons({
                     border: "none",
                     cursor: "pointer",
                     position: "relative",
-                    fontSize: "24px",
                 }}
             >
-                <MdMessage size={30} color="020100" />
+                <MdMessage size={30} color="#020100" />
             </button>
         </div>
     );

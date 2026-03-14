@@ -10,12 +10,17 @@ function MatchesScreen({ matches, openChat, goBack }) {
           cursor: "pointer",
           color: "#1f5f8b",
           marginBottom: "10px",
+          zIndex: "100",
         }}
       >
         ← Back
       </button>
 
-      <h1>Your Matches</h1>
+      <div style = {{
+        marginBottom: "25px"
+      }}>
+        <h1>Your Matches</h1>
+      </div>
 
       {matches.length === 0 ? (
         <p>No matches yet.</p>
