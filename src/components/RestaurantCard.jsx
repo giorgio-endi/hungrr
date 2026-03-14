@@ -151,7 +151,7 @@ function RestaurantCard({ restaurant, swipeDirection }) {
         <h2
           style={{
             fontSize: "20px",
-            color: "#1f5f8b",
+            color: "#020100",
             margin: "0 0 8px 0",
             lineHeight: "1.2",
           }}
@@ -162,7 +162,7 @@ function RestaurantCard({ restaurant, swipeDirection }) {
         <p
           style={{
             fontSize: "13px",
-            color: "#335c74",
+            color: "#020100",
             margin: "0 0 6px 0",
             lineHeight: "1.5",
           }}
@@ -173,7 +173,7 @@ function RestaurantCard({ restaurant, swipeDirection }) {
         <p
           style={{
             fontSize: "13px",
-            color: "#335c74",
+            color: "#020100",
             margin: "0 0 6px 0",
           }}
         >
@@ -183,7 +183,7 @@ function RestaurantCard({ restaurant, swipeDirection }) {
         <p
           style={{
             fontSize: "13px",
-            color: "#335c74",
+            color: "#020100",
             margin: "0 0 6px 0",
           }}
         >
@@ -193,7 +193,7 @@ function RestaurantCard({ restaurant, swipeDirection }) {
         <p
           style={{
             fontSize: "13px",
-            color: "#335c74",
+            color: "#020100",
             margin: 0,
           }}
         >

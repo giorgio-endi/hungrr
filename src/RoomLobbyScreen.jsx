@@ -35,7 +35,7 @@ function RoomLobbyScreen({
           left: "0px",
           border: "none",
           background: "transparent",
-          fontSize: "28px",
+          fontSize: "30px",
           cursor: "pointer",
           color: "#020100",
           zIndex: 20, // above everything
