@@ -6,6 +6,7 @@ export async function searchRestaurants(query) {
   const body = {
     textQuery: query,
     includedType: "restaurant",
+    strictTypeFiltering: true,
     maxResultCount: 10,
   };
 
@@ -15,17 +16,33 @@ export async function searchRestaurants(query) {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       "X-Goog-FieldMask":
-        "places.id,places.displayName,places.formattedAddress,places.rating",
+        "places.id,places.displayName,places.formattedAddress,places.rating,places.types",
     },
     body: JSON.stringify(body),
   });
 
   const data = await response.json();
   console.log("Google response:", data);
+  
+  
+  console.log("==== TYPES DEBUG ====");
+  console.log(
+  (data.places || []).map(place => ({
+    name: place.displayName?.text,
+    types: place.types
+  }))
+);
 
   if (!response.ok) {
     throw new Error(data?.error?.message || "Failed to fetch restaurants");
   }
 
-  return data.places || [];
+
+  const banned = ["supermarket", "grocery_store"];
+  const filteredPlaces = (data.places || []).filter(place =>
+    !place.types?.some(type => banned.includes(type))
+  );
+
+  console.log("Filtered places:", filteredPlaces);
+  return filteredPlaces;
 }
