@@ -137,7 +137,9 @@ function App() {
   }, [matches]);
 
   const availableDatingProfiles = useMemo(() => {
-    return allDatingProfiles.filter((profile) => !matchedUserIds.includes(profile.uid));
+    return allDatingProfiles.filter(
+      (profile) => !matchedUserIds.includes(profile.uid)
+    );
   }, [allDatingProfiles, matchedUserIds]);
 
   const datingProfile =
@@ -450,56 +452,57 @@ function App() {
         `}
       </style>
 
-      <AppShell>
-        <TopRightIcons
-          activeTab={activeTab}
-          matchCount={matchCount}
-          onOpenMatches={() => setCurrentScreen("matches")}
-          onOpenMessages={() => setCurrentScreen("messages")}
-        />
+      <AppShell
+        topRight={
+          <>
+            <TopRightIcons
+              activeTab={activeTab}
+              matchCount={matchCount}
+              onOpenMatches={() => setCurrentScreen("matches")}
+              onOpenMessages={() => setCurrentScreen("messages")}
+            />
 
-        <button
-          onClick={signOutUser}
-          style={{
-            position: "absolute",
-            top: "18px",
-            left: "18px",
-            zIndex: 5,
-            backgroundColor: "#4da8da",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            padding: "8px 12px",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
-        >
-          Sign Out
-        </button>
-
-        <div style={{ color: "#1f5f8b", fontSize: "24px", fontWeight: "700" }}>
-        TEST CONTENT
-        </div>
-
-
-        <BottomNav
-          activeTab={activeTab}
-          hovered={hovered}
-          setHovered={setHovered}
-          onDecide={() => {
-            setActiveTab("decide");
-            setCurrentScreen("main");
-          }}
-          onDating={() => {
-            setActiveTab("dating");
-            setCurrentScreen("main");
-          }}
-          onProfile={() => {
-            setActiveTab("profile");
-            setCurrentScreen("main");
-          }}
-        />
-      </AppShell>
+            <button
+              onClick={signOutUser}
+              style={{
+                position: "absolute",
+                top: "18px",
+                left: "18px",
+                zIndex: 5,
+                backgroundColor: "#e63946",
+                color: "white",
+                border: "none",
+                borderRadius: "12px",
+                padding: "8px 12px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Sign Out
+            </button>
+          </>
+        }
+        content={renderContent()}
+        bottomNav={
+          <BottomNav
+            activeTab={activeTab}
+            hovered={hovered}
+            setHovered={setHovered}
+            onDecide={() => {
+              setActiveTab("decide");
+              setCurrentScreen("main");
+            }}
+            onDating={() => {
+              setActiveTab("dating");
+              setCurrentScreen("main");
+            }}
+            onProfile={() => {
+              setActiveTab("profile");
+              setCurrentScreen("main");
+            }}
+          />
+        }
+      />
     </>
   );
 }
