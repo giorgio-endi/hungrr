@@ -13,7 +13,7 @@ function DecideHomeScreen({
     onJoinRoom,
 }) {
     const inputStyle = {
-        width: "250px",
+        width: "100%",
         padding: "14px",
         borderRadius: "7px",
         border: "none",
@@ -43,6 +43,8 @@ function DecideHomeScreen({
     });
 
     const formBoxStyle = {
+    display: "flex",
+    flexDirection: "column",
     borderRadius: "18px",
     padding: "0px",
     width: "100%",
