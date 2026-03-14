@@ -6,6 +6,8 @@ import {
   startSwiping,
 } from "./firestore";
 
+import RestaurantSwipeScreen from "./components/RestaurantSwipeScreen";
+
 function App() {
   const [hovered, setHovered] = useState(null);
   const [roomCode, setRoomCode] = useState("");
@@ -938,119 +940,7 @@ function App() {
   }
 
   function renderDecideSwipeScreen() {
-    return (
-      <>
-        <h1
-          style={{
-            fontSize: "36px",
-            color: "#1f5f8b",
-            marginBottom: "8px",
-            fontWeight: "700",
-            marginTop: "10px",
-          }}
-        >
-          Swipe Restaurants
-        </h1>
-
-        <p
-          style={{
-            fontSize: "16px",
-            color: "#24506d",
-            marginBottom: "22px",
-          }}
-        >
-          Room location: {roomData?.location}
-        </p>
-
-        <div
-          style={{
-            margin: "0 auto 24px auto",
-            width: "240px",
-            backgroundColor: "white",
-            borderRadius: "24px",
-            padding: "22px",
-            boxShadow: "0 8px 16px rgba(0,0,0,0.10)",
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              height: "180px",
-              borderRadius: "18px",
-              backgroundColor: "#dff2ff",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: "16px",
-              fontSize: "64px",
-            }}
-          >
-            🍜
-          </div>
-
-          <h2
-            style={{
-              fontSize: "24px",
-              color: "#1f5f8b",
-              margin: "0 0 8px 0",
-            }}
-          >
-            Restaurant cards go here
-          </h2>
-
-          <p
-            style={{
-              fontSize: "15px",
-              color: "#335c74",
-              margin: "0 0 6px 0",
-            }}
-          >
-            Next step: load restaurants based on the room location.
-          </p>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "16px",
-            marginTop: "10px",
-          }}
-        >
-          <button
-            style={{
-              width: "110px",
-              padding: "14px",
-              borderRadius: "14px",
-              border: "none",
-              backgroundColor: "#4da8da",
-              color: "white",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-          >
-            Dislike
-          </button>
-
-          <button
-            style={{
-              width: "110px",
-              padding: "14px",
-              borderRadius: "14px",
-              border: "none",
-              backgroundColor: "#4da8da",
-              color: "white",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-          >
-            Like
-          </button>
-        </div>
-
-        <div style={{ height: "40px" }} />
-      </>
-    );
+    return <RestaurantSwipeScreen roomData={roomData} />
   }
 
   function renderContent() {
