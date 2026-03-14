@@ -47,7 +47,7 @@ function DecideHomeScreen({
     padding: "0px",
     width: "100%",
     maxWidth: "260px",
-    margin: "19px auto",
+    margin: "17px auto",
     textAlign: "left",
     };
 

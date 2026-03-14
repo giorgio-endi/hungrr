@@ -47,9 +47,9 @@ function AppShell({ topRight, content, bottomNav }) {
                 <div
                     style={{
                         position: "absolute",
-                        left: "16px",
-                        right: "16px",
-                        bottom: "16px",
+                        left: "0px",
+                        right: "0px",
+                        bottom: "0px",
                         zIndex: 4,
                     }}
                 >

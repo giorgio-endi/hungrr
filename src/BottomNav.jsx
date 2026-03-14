@@ -1,3 +1,5 @@
+import { FaRegLightbulb, FaHeart, FaUser } from "react-icons/fa"; 
+
 function BottomNav({
     activeTab,
     hovered,
@@ -6,64 +8,68 @@ function BottomNav({
     onDating,
     onProfile,
 }) {
-    const navButtonStyle = (tabName) => ({
+    const iconTextColor = (tabName) => {
+        if (activeTab === tabName) return "#f86261";       // active color
+        if (hovered === `nav-${tabName}`) return "#fdd0cd"; // hover color
+        return "#f4f8f9";                                  // default color
+    };
+
+    const navButtonStyle = {
         flex: 1,
         border: "none",
-        backgroundColor:
-            activeTab === tabName
-                ? "#4da8da"
-                : hovered === `nav-${tabName}`
-                    ? "#fdd0cd"
-                    : "transparent",
-        color: activeTab === tabName ? "white" : "#f4f8f9",
-        fontSize: "14px",
-        fontWeight: "600",
-        padding: "12px 6px",
-        borderRadius: "14px",
+        backgroundColor: "transparent", // keep button bg constant
         cursor: "pointer",
-        transition: "0.2s",
-    });
+        padding: "6px 0px",
+        borderRadius: "14px",
+    };
 
     return (
         <div
             style={{
                 position: "absolute",
-                bottom: "16px",
-                left: "16px",
-                right: "16px",
+                bottom: "0px",
+                left: "0px",
+                right: "0px",
                 backgroundColor: "#020100",
-                borderRadius: "20px",
-                padding: "8px",
+                padding: "15px",
                 display: "flex",
-                gap: "8px",
-                boxShadow: "0 6px 14px rgba(0,0,0,0.10)",
+                gap: "18px",
             }}
         >
             <button
                 onClick={onDecide}
                 onMouseEnter={() => setHovered("nav-decide")}
                 onMouseLeave={() => setHovered(null)}
-                style={navButtonStyle("decide")}
+                style={navButtonStyle}
             >
-                Decide
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", color: iconTextColor("decide") }}>
+                    <FaRegLightbulb size={20} />
+                    <span>Decide</span>
+                </div>
             </button>
 
             <button
                 onClick={onDating}
                 onMouseEnter={() => setHovered("nav-dating")}
                 onMouseLeave={() => setHovered(null)}
-                style={navButtonStyle("dating")}
+                style={navButtonStyle}
             >
-                Dating
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", color: iconTextColor("dating") }}>
+                    <FaHeart size={20} />
+                    <span>Dating</span>
+                </div>
             </button>
 
             <button
                 onClick={onProfile}
                 onMouseEnter={() => setHovered("nav-profile")}
                 onMouseLeave={() => setHovered(null)}
-                style={navButtonStyle("profile")}
+                style={navButtonStyle}
             >
-                Profile
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", color: iconTextColor("profile") }}>
+                    <FaUser size={20} />
+                    <span>Profile</span>
+                </div>
             </button>
         </div>
     );
