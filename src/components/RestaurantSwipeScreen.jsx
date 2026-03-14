@@ -7,6 +7,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
   const [restaurantIndex, setRestaurantIndex] = useState(0);
   const [restaurantsLoading, setRestaurantsLoading] = useState(false);
   const [restaurantsError, setRestaurantsError] = useState("");
+  const [swipeDirection, setSwipeDirection] = useState("");
 
   useEffect(() => {
     async function loadRestaurants() {
@@ -35,13 +36,30 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
 
   const currentRestaurant = restaurants[restaurantIndex];
 
-  function goNextRestaurant() {
+  function loadNextRestaurant() {
     setRestaurantIndex((prev) => {
       if (prev < restaurants.length - 1) {
         return prev + 1;
       }
       return prev;
     });
+    setSwipeDirection("");
+  }
+
+  function handleDislike() {
+    setSwipeDirection("left");
+
+    setTimeout(() => {
+      loadNextRestaurant();
+    }, 300);
+  }
+
+  function handleLike() {
+    setSwipeDirection("right");
+
+    setTimeout(() => {
+      loadNextRestaurant();
+    }, 300);
   }
 
   return (
@@ -89,7 +107,10 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
       ) : restaurants.length === 0 ? (
         <p style={{ color: "#1f5f8b" }}>No restaurants found.</p>
       ) : (
-        <RestaurantCard restaurant={currentRestaurant} />
+        <RestaurantCard
+          restaurant={currentRestaurant}
+          swipeDirection={swipeDirection}
+        />
       )}
 
       <div
@@ -102,7 +123,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
         }}
       >
         <button
-          onClick={goNextRestaurant}
+          onClick={handleDislike}
           style={{
             width: "110px",
             padding: "14px",
@@ -118,7 +139,7 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
         </button>
 
         <button
-          onClick={goNextRestaurant}
+          onClick={handleLike}
           style={{
             width: "110px",
             padding: "14px",

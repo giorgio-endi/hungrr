@@ -1,4 +1,4 @@
-function RestaurantCard({ restaurant }) {
+function RestaurantCard({ restaurant, swipeDirection }) {
     const photos = restaurant?.photos || [];
   
     const photoUrls = photos.slice(0, 3).map((photo) => {
@@ -25,6 +25,13 @@ function RestaurantCard({ restaurant }) {
         .replace(/\b\w/g, (char) => char.toUpperCase());
     }
   
+    const cardTransform =
+      swipeDirection === "left"
+        ? "translateX(-220px) rotate(-12deg)"
+        : swipeDirection === "right"
+        ? "translateX(220px) rotate(12deg)"
+        : "translateX(0) rotate(0deg)";
+  
     return (
       <div
         style={{
@@ -34,6 +41,9 @@ function RestaurantCard({ restaurant }) {
           borderRadius: "24px",
           padding: "18px",
           boxShadow: "0 8px 16px rgba(0,0,0,0.10)",
+          transform: cardTransform,
+          opacity: swipeDirection ? 0.65 : 1,
+          transition: "transform 0.3s ease, opacity 0.3s ease",
         }}
       >
         <div
