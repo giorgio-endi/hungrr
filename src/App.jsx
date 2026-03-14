@@ -32,6 +32,7 @@ import MessagesScreen from "./MessagesScreen";
 import ChatScreen from "./ChatScreen";
 
 import ProfileScreen from "./ProfileScreen";
+import MatchedRestaurantScreen from "./MatchedRestaurantScreen";
 
 function App() {
   const [hovered, setHovered] = useState(null);
@@ -201,21 +202,23 @@ function App() {
     if (roomUnsubscribe) {
       roomUnsubscribe();
     }
-
+  
     const unsubscribe = subscribeToRoom(code, (data) => {
       if (!data) {
         return;
       }
-
+  
       setRoomData(data);
-
+  
       if (data.status === "swiping") {
         setDecideScreen("swipe");
+      } else if (data.status === "matched") {
+        setDecideScreen("matched");
       } else {
         setDecideScreen("room");
       }
     });
-
+  
     setRoomUnsubscribe(() => unsubscribe);
   }
 
@@ -450,6 +453,14 @@ function App() {
           />
         );
       }
+    }
+    if (decideScreen === "matched") {
+      return (
+        <MatchedRestaurantScreen
+          roomData={roomData}
+          goBack={resetDecideFlow}
+        />
+      );
     }
 
     if (activeTab === "dating") {
