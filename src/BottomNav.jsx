@@ -1,4 +1,4 @@
-import { FaRegLightbulb, FaHeart, FaUser } from "react-icons/fa"; 
+import { FaRegLightbulb, FaHeart, FaUser } from "react-icons/fa";
 
 function BottomNav({
     activeTab,
@@ -9,15 +9,15 @@ function BottomNav({
     onProfile,
 }) {
     const iconTextColor = (tabName) => {
-        if (activeTab === tabName) return "#f86261";       // active color
-        if (hovered === `nav-${tabName}`) return "#fdd0cd"; // hover color
-        return "#f4f8f9";                                  // default color
+        if (activeTab === tabName) return "#f86261";
+        if (hovered === `nav-${tabName}`) return "#fdd0cd";
+        return "#f4f8f9";
     };
 
     const navButtonStyle = {
         flex: 1,
         border: "none",
-        backgroundColor: "transparent", // keep button bg constant
+        backgroundColor: "transparent",
         cursor: "pointer",
         padding: "6px 0px",
         borderRadius: "14px",
@@ -42,7 +42,15 @@ function BottomNav({
                 onMouseLeave={() => setHovered(null)}
                 style={navButtonStyle}
             >
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", color: iconTextColor("decide") }}>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "10px",
+                        color: iconTextColor("decide"),
+                    }}
+                >
                     <FaRegLightbulb size={20} />
                     <span>Decide</span>
                 </div>
@@ -54,7 +62,15 @@ function BottomNav({
                 onMouseLeave={() => setHovered(null)}
                 style={navButtonStyle}
             >
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", color: iconTextColor("dating") }}>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "10px",
+                        color: iconTextColor("dating"),
+                    }}
+                >
                     <FaHeart size={20} />
                     <span>Dating</span>
                 </div>
@@ -66,7 +82,15 @@ function BottomNav({
                 onMouseLeave={() => setHovered(null)}
                 style={navButtonStyle}
             >
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", color: iconTextColor("profile") }}>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "10px",
+                        color: iconTextColor("profile"),
+                    }}
+                >
                     <FaUser size={20} />
                     <span>Profile</span>
                 </div>

@@ -22,7 +22,6 @@ function AppShell({ topRight, content, bottomNav }) {
                     boxSizing: "border-box",
                 }}
             >
-
                 {topRight}
 
                 <div
