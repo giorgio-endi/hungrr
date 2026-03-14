@@ -5,6 +5,7 @@ function RoomLobbyScreen({
     hovered,
     setHovered,
     onStartSwiping,
+    goBack,
 }) {
     const users = roomData?.users || [];
 
@@ -23,6 +24,20 @@ function RoomLobbyScreen({
 
     return (
         <>
+            <button
+                onClick={goBack}
+                style={{
+                    border: "none",
+                    background: "transparent",
+                    fontSize: "22px",
+                    cursor: "pointer",
+                    color: "#1f5f8b",
+                    marginBottom: "10px",
+                }}
+            >
+                ← Back
+            </button>
+
             <h1 style={{ fontSize: "36px", color: "#1f5f8b", fontWeight: "700" }}>
                 Room Lobby
             </h1>
@@ -49,7 +64,6 @@ function RoomLobbyScreen({
                 <p>
                     <strong>Host:</strong> {roomData?.host}
                 </p>
-
                 <p>
                     <strong>Status:</strong> {roomData?.status}
                 </p>

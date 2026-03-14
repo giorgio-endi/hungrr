@@ -27,16 +27,11 @@ function BottomNav({
     return (
         <div
             style={{
-                position: "absolute",
-                bottom: "16px",
-                left: "16px",
-                right: "16px",
                 backgroundColor: "rgba(255,255,255,0.85)",
                 borderRadius: "20px",
                 padding: "8px",
                 display: "flex",
                 gap: "8px",
-                zIndex: 3,
                 boxShadow: "0 6px 14px rgba(0,0,0,0.10)",
             }}
         >

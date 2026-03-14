@@ -51,6 +51,7 @@ function App() {
   const [isHost, setIsHost] = useState(false);
   const [roomData, setRoomData] = useState(null);
   const [decideScreen, setDecideScreen] = useState("home");
+  const [isAnimatingSwipe, setIsAnimatingSwipe] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
@@ -64,6 +65,7 @@ function App() {
         try {
           const profile = await getUserProfile(user.uid);
           setUserProfile(profile);
+
           if (profile?.username) {
             setUsername(profile.username);
           }
@@ -265,16 +267,24 @@ function App() {
   }
 
   function handleDislike() {
+    if (isAnimatingSwipe) return;
+
+    setIsAnimatingSwipe(true);
     setMatchMessage("Not a match");
     setSwipeDirection("left");
 
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 1800);
+      setIsAnimatingSwipe(false);
+    }, 350);
   }
 
   function handleLike() {
+    if (isAnimatingSwipe) return;
+
+    setIsAnimatingSwipe(true);
+
     const gotMatch = Math.random() < 0.4;
     setSwipeDirection("right");
 
@@ -307,7 +317,8 @@ function App() {
     setTimeout(() => {
       loadNextDatingProfile();
       setMatchMessage("");
-    }, 1800);
+      setIsAnimatingSwipe(false);
+    }, 350);
   }
 
   function handleSendMessage() {
@@ -326,7 +337,13 @@ function App() {
 
   function renderContent() {
     if (currentScreen === "matches") {
-      return <MatchesScreen matches={matches} openChat={openChat} />;
+      return (
+        <MatchesScreen
+          matches={matches}
+          openChat={openChat}
+          goBack={() => setCurrentScreen("main")}
+        />
+      );
     }
 
     if (currentScreen === "messages") {
@@ -335,6 +352,7 @@ function App() {
           matches={matches}
           messages={messages}
           openChat={openChat}
+          goBack={() => setCurrentScreen("main")}
         />
       );
     }
@@ -381,12 +399,18 @@ function App() {
             hovered={hovered}
             setHovered={setHovered}
             onStartSwiping={handleStartSwiping}
+            goBack={() => setDecideScreen("home")}
           />
         );
       }
 
       if (decideScreen === "swipe") {
-        return <RestaurantSwipeScreen roomData={roomData} />;
+        return (
+          <RestaurantSwipeScreen
+            roomData={roomData}
+            goBack={() => setDecideScreen("room")}
+          />
+        );
       }
     }
 
@@ -446,53 +470,57 @@ function App() {
         `}
       </style>
 
-      <AppShell>
-        <TopRightIcons
-          activeTab={activeTab}
-          matchCount={matchCount}
-          onOpenMatches={() => setCurrentScreen("matches")}
-          onOpenMessages={() => setCurrentScreen("messages")}
-        />
+      <AppShell
+        topRight={
+          <>
+            <button
+              onClick={signOutUser}
+              style={{
+                position: "absolute",
+                top: "18px",
+                left: "18px",
+                zIndex: 5,
+                backgroundColor: "#4da8da",
+                color: "white",
+                border: "none",
+                borderRadius: "12px",
+                padding: "8px 12px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Sign Out
+            </button>
 
-        <button
-          onClick={signOutUser}
-          style={{
-            position: "absolute",
-            top: "18px",
-            left: "18px",
-            zIndex: 5,
-            backgroundColor: "#4da8da",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            padding: "8px 12px",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}
-        >
-          Sign Out
-        </button>
-
-        {renderContent()}
-
-        <BottomNav
-          activeTab={activeTab}
-          hovered={hovered}
-          setHovered={setHovered}
-          onDecide={() => {
-            setActiveTab("decide");
-            setCurrentScreen("main");
-          }}
-          onDating={() => {
-            setActiveTab("dating");
-            setCurrentScreen("main");
-          }}
-          onProfile={() => {
-            setActiveTab("profile");
-            setCurrentScreen("main");
-          }}
-        />
-      </AppShell>
+            <TopRightIcons
+              activeTab={activeTab}
+              matchCount={matchCount}
+              onOpenMatches={() => setCurrentScreen("matches")}
+              onOpenMessages={() => setCurrentScreen("messages")}
+            />
+          </>
+        }
+        content={renderContent()}
+        bottomNav={
+          <BottomNav
+            activeTab={activeTab}
+            hovered={hovered}
+            setHovered={setHovered}
+            onDecide={() => {
+              setActiveTab("decide");
+              setCurrentScreen("main");
+            }}
+            onDating={() => {
+              setActiveTab("dating");
+              setCurrentScreen("main");
+            }}
+            onProfile={() => {
+              setActiveTab("profile");
+              setCurrentScreen("main");
+            }}
+          />
+        }
+      />
     </>
   );
 }

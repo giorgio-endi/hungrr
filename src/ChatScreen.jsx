@@ -10,7 +10,19 @@ function ChatScreen({
 
     return (
         <>
-            <button onClick={goBack}>← Back</button>
+            <button
+                onClick={goBack}
+                style={{
+                    border: "none",
+                    background: "transparent",
+                    fontSize: "22px",
+                    cursor: "pointer",
+                    color: "#1f5f8b",
+                    marginBottom: "10px",
+                }}
+            >
+                ← Back
+            </button>
 
             <h2>{selectedChat?.name}</h2>
 
