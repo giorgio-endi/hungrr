@@ -68,9 +68,9 @@ body {
 
 h1,
 h2 {
-  font-family: var(--heading);
+  font-family: "Ubuntu", sans-serif;
   font-weight: 500;
-  color: var(--text-h);
+  color: #020100;
 }
 
 h1 {
@@ -92,6 +92,7 @@ h2 {
   }
 }
 p {
+  font-family: "Roboto";
   margin: 0;
 }
 
