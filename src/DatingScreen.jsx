@@ -43,13 +43,7 @@ function DatingScreen({
         You have seen everyone!
         </h1>
 
-        <p
-          style={{
-            fontSize: "18px",
-            color: "#020100",
-            marginBottom: "22px",
-          }}
-        >
+        <p>
           No more users to swipe right now..
         </p>
       </>

@@ -524,6 +524,17 @@ function App() {
             matchCount={matchCount}
             onOpenMatches={() => setCurrentScreen("matches")}
             onOpenMessages={() => setCurrentScreen("messages")}
+             goBack={() => {
+
+              if (currentScreen === "chat") {
+                 
+                  setCurrentScreen("messages");
+              } else if (currentScreen === "messages" || currentScreen === "matches") {
+                  
+                  setCurrentScreen("main");
+              }
+          }}
+            screen={currentScreen}
           />
         }
         content={renderContent()}

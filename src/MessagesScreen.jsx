@@ -1,27 +1,14 @@
 function MessagesScreen({ matches, messages, openChat, goBack }) {
   return (
     <>
-      <button
-        onClick={goBack}
+      <div
         style={{
-          border: "none",
-          background: "transparent",
-          fontSize: "22px",
-          cursor: "pointer",
-          color: "#1f5f8b",
-          marginBottom: "10px",
+          marginTop: "40px",
+          marginBottom: "25px",
         }}
       >
-        ← Back
-      </button>
-
-
-      <div style = {{
-        marginBottom: "25px"
-      }}>
         <h1>Messages</h1>
       </div>
-
 
       {matches.length === 0 ? (
         <p>No messages yet.</p>
@@ -29,7 +16,6 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
         matches.map((match) => {
           const lastMessage =
             messages[match.id]?.[messages[match.id].length - 1]?.text || "";
-
 
           return (
             <button
@@ -76,12 +62,34 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
                 </div>
               )}
 
-
-              <div>
-                <p style={{ margin: 0, fontWeight: "700", color: "#1f5f8b" }}>
+              <div
+                style={{
+                  flex: 1,          
+                  minWidth: 0,       
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontWeight: "700",
+                    color: "#1f5f8b",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
                   {match.username}
                 </p>
-                <p style={{ margin: 0, color: "#335c74", fontSize: "14px" }}>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#335c74",
+                    fontSize: "14px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
                   {lastMessage || "Start chatting"}
                 </p>
               </div>
@@ -93,6 +101,4 @@ function MessagesScreen({ matches, messages, openChat, goBack }) {
   );
 }
 
-
 export default MessagesScreen;
-

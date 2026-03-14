@@ -1,22 +1,9 @@
 function MatchesScreen({ matches, openChat, goBack }) {
   return (
     <>
-      <button
-        onClick={goBack}
-        style={{
-          border: "none",
-          background: "transparent",
-          fontSize: "22px",
-          cursor: "pointer",
-          color: "#1f5f8b",
-          marginBottom: "10px",
-          zIndex: "100",
-        }}
-      >
-        ← Back
-      </button>
 
       <div style = {{
+        marginTop: "40px",
         marginBottom: "25px"
       }}>
         <h1>Your Matches</h1>

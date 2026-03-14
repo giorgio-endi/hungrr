@@ -93,7 +93,9 @@ h2 {
 }
 p {
   font-family: "Roboto";
-  margin: 0;
+  font-size: 17px;
+  color: #020100;
+  margin: 0px 0px;
 }
 
 code,
