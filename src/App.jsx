@@ -309,7 +309,7 @@ function App() {
     setTimeout(() => {
       goNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 400);
   }
 
   async function handleLike() {
@@ -354,7 +354,7 @@ function App() {
     setTimeout(() => {
       goNextDatingProfile();
       setMatchMessage("");
-    }, 800);
+    }, 400);
   }
 
   async function handleSendMessage() {
