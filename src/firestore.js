@@ -1,4 +1,4 @@
-import { db, auth, storage } from "./firebase";
+import { db, auth } from "./firebase";
 import {
   doc,
   setDoc,
@@ -17,15 +17,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
 
 // -------------------- ROOM FUNCTIONS --------------------
 
-// create a room
 export async function createRoom(roomCode, location, hostName) {
   const roomRef = doc(db, "rooms", roomCode);
 
@@ -39,7 +33,6 @@ export async function createRoom(roomCode, location, hostName) {
   });
 }
 
-// join a room
 export async function joinRoom(roomCode, username) {
   const roomRef = doc(db, "rooms", roomCode);
   const roomSnap = await getDoc(roomRef);
@@ -53,7 +46,6 @@ export async function joinRoom(roomCode, username) {
   });
 }
 
-// listen to room changes in real time
 export function subscribeToRoom(roomCode, callback) {
   const roomRef = doc(db, "rooms", roomCode);
 
@@ -66,7 +58,6 @@ export function subscribeToRoom(roomCode, callback) {
   });
 }
 
-// host starts swiping
 export async function startSwiping(roomCode) {
   const roomRef = doc(db, "rooms", roomCode);
 
@@ -75,7 +66,6 @@ export async function startSwiping(roomCode) {
   });
 }
 
-// save a vote
 export async function saveVote(roomCode, restaurantId, username, vote) {
   await setDoc(
     doc(db, "rooms", roomCode, "votes", restaurantId),
@@ -148,23 +138,6 @@ export async function saveUserProfile(uid, profileData) {
     },
     { merge: true }
   );
-}
-
-export async function uploadProfilePicture(uid, file) {
-  const storageRef = ref(
-    storage,
-    `profilePictures/${uid}/${Date.now()}-${file.name}`
-  );
-
-  await uploadBytes(storageRef, file);
-  const downloadURL = await getDownloadURL(storageRef);
-
-  await updateDoc(doc(db, "profiles", uid), {
-    photoURL: downloadURL,
-    updatedAt: Date.now(),
-  });
-
-  return downloadURL;
 }
 
 // -------------------- REALTIME PROFILES --------------------
@@ -277,4 +250,3 @@ export function subscribeToMessages(matchId, callback) {
     callback(msgs);
   });
 }
-

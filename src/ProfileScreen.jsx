@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { saveUserProfile, uploadProfilePicture } from "./firestore";
+import { saveUserProfile } from "./firestore";
 
 function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
   const [saving, setSaving] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -25,7 +24,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
         bio: userProfile.bio || "",
         photoURL: userProfile.photoURL || "",
       });
-      setPreviewImage(userProfile.photoURL || "");
     }
   }, [userProfile]);
 
@@ -37,10 +35,10 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     }));
   }
 
-  function resizeImage(file) {
+  function resizeImageToBase64(file) {
     return new Promise((resolve, reject) => {
-      const img = new Image();
       const reader = new FileReader();
+      const img = new Image();
 
       reader.onload = (event) => {
         img.src = event.target.result;
@@ -50,8 +48,9 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
 
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const maxSize = 600;
+        const ctx = canvas.getContext("2d");
 
+        const maxSize = 220;
         let { width, height } = img;
 
         if (width > height) {
@@ -69,30 +68,45 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
         canvas.width = width;
         canvas.height = height;
 
-        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              reject(new Error("Image compression failed"));
-              return;
-            }
-
-            const compressedFile = new File([blob], file.name, {
-              type: "image/jpeg",
-            });
-
-            resolve(compressedFile);
-          },
-          "image/jpeg",
-          0.75
-        );
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.65);
+        resolve(compressedBase64);
       };
 
       img.onerror = reject;
+
       reader.readAsDataURL(file);
     });
+  }
+
+  async function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file || !currentUser) return;
+
+    try {
+      setSaving(true);
+
+      const base64Image = await resizeImageToBase64(file);
+
+      const updatedProfile = {
+        ...formData,
+        uid: currentUser.uid,
+        photoURL: base64Image,
+      };
+
+      setFormData(updatedProfile);
+      setUserProfile(updatedProfile);
+
+      await saveUserProfile(currentUser.uid, updatedProfile);
+
+      alert("Profile picture uploaded!");
+    } catch (error) {
+      console.error(error);
+      alert("Could not upload profile picture.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleSaveProfile() {
@@ -117,48 +131,6 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     }
   }
 
-  async function handleFileChange(e) {
-    const file = e.target.files[0];
-    if (!file || !currentUser) return;
-
-    const localPreview = URL.createObjectURL(file);
-    setPreviewImage(localPreview);
-
-    try {
-      setSaving(true);
-
-      const smallerFile = await resizeImage(file);
-      const imageUrl = await uploadProfilePicture(currentUser.uid, smallerFile);
-
-      const updatedData = {
-        ...formData,
-        photoURL: imageUrl,
-      };
-
-      setFormData(updatedData);
-      setPreviewImage(imageUrl);
-
-      setUserProfile((prev) => ({
-        ...(prev || {}),
-        ...updatedData,
-      }));
-
-      await saveUserProfile(currentUser.uid, {
-        ...updatedData,
-        uid: currentUser.uid,
-      });
-
-      alert("Profile picture uploaded!");
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Could not upload profile picture.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const displayImage = previewImage || formData.photoURL;
-
   return (
     <>
       <h1>Your Profile</h1>
@@ -176,9 +148,9 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
           overflow: "hidden",
         }}
       >
-        {displayImage ? (
+        {formData.photoURL ? (
           <img
-            src={displayImage}
+            src={formData.photoURL}
             alt="Profile"
             style={{
               width: "100%",
@@ -289,4 +261,3 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
 }
 
 export default ProfileScreen;
-
