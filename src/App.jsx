@@ -477,7 +477,10 @@ function App() {
           Sign Out
         </button>
 
-        {renderContent()}
+        <div style={{ color: "#1f5f8b", fontSize: "24px", fontWeight: "700" }}>
+        TEST CONTENT
+        </div>
+
 
         <BottomNav
           activeTab={activeTab}
