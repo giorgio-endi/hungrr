@@ -5,6 +5,26 @@ function RestaurantCard({ restaurant }) {
       return `https://places.googleapis.com/v1/${photo.name}/media?maxHeightPx=400&key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}`;
     });
   
+    function formatPriceLevel(priceLevel) {
+      if (!priceLevel) return "N/A";
+  
+      if (priceLevel === "PRICE_LEVEL_INEXPENSIVE") return "$";
+      if (priceLevel === "PRICE_LEVEL_MODERATE") return "$$";
+      if (priceLevel === "PRICE_LEVEL_EXPENSIVE") return "$$$";
+      if (priceLevel === "PRICE_LEVEL_VERY_EXPENSIVE") return "$$$$";
+  
+      return "N/A";
+    }
+  
+    function formatType(type) {
+      if (!type) return "N/A";
+  
+      return type
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+  
     return (
       <div
         style={{
@@ -157,7 +177,7 @@ function RestaurantCard({ restaurant }) {
             margin: "0 0 6px 0",
           }}
         >
-          Price: {restaurant?.priceLevel || "N/A"}
+          Price: {formatPriceLevel(restaurant?.priceLevel)}
         </p>
   
         <p
@@ -167,7 +187,7 @@ function RestaurantCard({ restaurant }) {
             margin: 0,
           }}
         >
-          Type: {restaurant?.primaryType || restaurant?.types?.[0] || "N/A"}
+          Type: {formatType(restaurant?.primaryType || restaurant?.types?.[0])}
         </p>
       </div>
     );
