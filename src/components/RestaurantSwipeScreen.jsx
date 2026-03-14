@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { searchRestaurants } from "../api/restaurants";
 import RestaurantCard from "./RestaurantCard";
+import { saveVote } from "../firestore";
 
-function RestaurantSwipeScreen({ roomData, goBack }) {
+function RestaurantSwipeScreen({ roomData, goBack, currentUsername }) {
   const [restaurants, setRestaurants] = useState([]);
   const [restaurantIndex, setRestaurantIndex] = useState(0);
   const [restaurantsLoading, setRestaurantsLoading] = useState(false);
@@ -44,23 +45,52 @@ function RestaurantSwipeScreen({ roomData, goBack }) {
       return prev;
     });
     setSwipeDirection("");
+
   }
 
-  function handleDislike() {
-    setSwipeDirection("left");
+  async function handleDislike() {
+  if (!currentRestaurant) return;
+
+  setSwipeDirection("left");
+
+  try {
+    await saveVote(
+      roomData.code,
+      currentRestaurant.id,
+      currentUsername,
+      "dislike",
+      currentRestaurant
+    );
 
     setTimeout(() => {
       loadNextRestaurant();
     }, 300);
+  } catch (error) {
+    console.error("Failed to save dislike:", error);
   }
+}
 
-  function handleLike() {
-    setSwipeDirection("right");
+async function handleLike() {
+  if (!currentRestaurant) return;
+
+  setSwipeDirection("right");
+
+  try {
+    await saveVote(
+      roomData.code,
+      currentRestaurant.id,
+      currentUsername,
+      "like",
+      currentRestaurant
+    );
 
     setTimeout(() => {
       loadNextRestaurant();
     }, 300);
+  } catch (error) {
+    console.error("Failed to save like:", error);
   }
+}
 
   return (
     <>

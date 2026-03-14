@@ -66,14 +66,66 @@ export async function startSwiping(roomCode) {
   });
 }
 
-export async function saveVote(roomCode, restaurantId, username, vote) {
+export async function saveVote(
+  roomCode,
+  restaurantId,
+  username,
+  vote,
+  restaurantData = null
+) {
+  const roomRef = doc(db, "rooms", roomCode);
+  const voteRef = doc(db, "rooms", roomCode, "votes", restaurantId);
+
+  const roomSnap = await getDoc(roomRef);
+
+  if (!roomSnap.exists()) {
+    throw new Error("Room does not exist");
+  }
+
+  const roomData = roomSnap.data();
+  const users = roomData.users || [];
+
   await setDoc(
-    doc(db, "rooms", roomCode, "votes", restaurantId),
+    voteRef,
     {
       [username]: vote,
+      updatedAt: Date.now(),
     },
     { merge: true }
   );
+
+  // check if everyone in the room liked this restaurant
+  const voteSnap = await getDoc(voteRef);
+  const voteData = voteSnap.exists() ? voteSnap.data() : {};
+
+  let everyoneLiked = true;
+
+  for (const user of users) {
+    if (voteData[user] !== "like") {
+      everyoneLiked = false;
+      break;
+    }
+  }
+
+  if (everyoneLiked && users.length > 0) {
+    await updateDoc(roomRef, {
+      status: "matched",
+      matchedRestaurant: restaurantData || null,
+      matchedRestaurantId: restaurantId,
+      matchedAt: Date.now(),
+    });
+  }
+}
+
+export async function resetRoomToSwiping(roomCode) {
+  const roomRef = doc(db, "rooms", roomCode);
+
+  await updateDoc(roomRef, {
+    status: "swiping",
+    matchedRestaurant: null,
+    matchedRestaurantId: null,
+    matchedAt: null,
+  });
 }
 
 // -------------------- AUTH + PROFILE FUNCTIONS --------------------

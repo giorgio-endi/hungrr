@@ -446,6 +446,7 @@ function App() {
           <RestaurantSwipeScreen
             roomData={roomData}
             goBack={resetDecideFlow}
+            currentUsername={username}
           />
         );
       }
