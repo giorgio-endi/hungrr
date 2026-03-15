@@ -74,7 +74,7 @@ function RestaurantSwipeScreen({ roomData, goBack, currentUsername }) {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* --- Top fixed area --- */}
+      {}
       <div
         style={{
           position: "absolute",
@@ -119,7 +119,7 @@ function RestaurantSwipeScreen({ roomData, goBack, currentUsername }) {
         </p>
       </div>
 
-      {/* --- Scrollable swipe area --- */}
+      {}
       <div
         style={{
           position: "absolute",
@@ -147,7 +147,7 @@ function RestaurantSwipeScreen({ roomData, goBack, currentUsername }) {
         )}
       </div>
 
-      {/* --- Bottom fixed buttons --- */}
+      
       <div
         style={{
           position: "absolute",
@@ -179,7 +179,7 @@ function RestaurantSwipeScreen({ roomData, goBack, currentUsername }) {
         </button>
       </div>
 
-      {/* --- Custom minimalistic scrollbar styles --- */}
+      
       <style>
         {`
           .custom-scrollbar::-webkit-scrollbar {
