@@ -18,7 +18,7 @@ import {
     signOut,
 } from "firebase/auth";
 
-// -------------------- ROOM FUNCTIONS --------------------
+
 
 export async function createRoom(roomCode, location, hostName) {
     const roomRef = doc(db, "rooms", roomCode);
@@ -127,7 +127,7 @@ export async function resetRoomToSwiping(roomCode) {
     });
 }
 
-// -------------------- AUTH + PROFILE FUNCTIONS --------------------
+
 
 function usernameToEmail(username) {
     return `${username.trim().toLowerCase()}@hungrr.app`;
@@ -202,7 +202,7 @@ export async function saveProfilePictureBase64(uid, base64String) {
     return base64String;
 }
 
-// -------------------- REALTIME PROFILES --------------------
+
 
 export function subscribeToProfilesExceptCurrentUser(currentUid, callback) {
     const profilesRef = collection(db, "profiles");
@@ -222,7 +222,7 @@ export function subscribeToProfilesExceptCurrentUser(currentUid, callback) {
     });
 }
 
-// -------------------- DATING / MATCHES --------------------
+
 
 export async function createMatch(currentUserProfile, otherUserProfile) {
     const matchId = [currentUserProfile.uid, otherUserProfile.uid].sort().join("_");

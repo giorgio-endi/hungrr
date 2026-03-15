@@ -73,7 +73,7 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     }
   }
 
-  // ----- STYLES -----
+  // STYLES
   const inputStyle = {
     width: "100%",
     padding: "12px",
@@ -104,7 +104,7 @@ function ProfileScreen({ currentUser, userProfile, setUserProfile }) {
     boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
   };
 
-  // ----- RENDER -----
+  // RENDER
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
       {/* TOP BAR SPACE */}

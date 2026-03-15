@@ -13,7 +13,7 @@ function MatchedRestaurantScreen({ roomData, goBack }) {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      {/* --- Top fixed area --- */}
+      {/*Top fixed area*/}
       <div
         style={{
           position: "absolute",
@@ -73,7 +73,7 @@ function MatchedRestaurantScreen({ roomData, goBack }) {
         </p>
       </div>
 
-      {/* --- Scrollable swipe area --- */}
+      {/* Scrollable swipe area  */}
       <div
         style={{
           position: "absolute",
@@ -100,7 +100,7 @@ function MatchedRestaurantScreen({ roomData, goBack }) {
         )}
       </div>
 
-      {/* --- Custom minimalistic scrollbar styles --- */}
+      {/* Custom minimalistic scrollbar styles */}
       <style>
         {`
           .custom-scrollbar::-webkit-scrollbar {
