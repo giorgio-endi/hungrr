@@ -5,7 +5,6 @@ import {
   subscribeToRoom,
   startSwiping,
   getUserProfile,
-  signOutUser,
   getUserMatches,
   createMatch,
   sendMessage,
@@ -202,14 +201,14 @@ function App() {
     if (roomUnsubscribe) {
       roomUnsubscribe();
     }
-  
+
     const unsubscribe = subscribeToRoom(code, (data) => {
       if (!data) {
         return;
       }
-  
+
       setRoomData(data);
-  
+
       if (data.status === "swiping") {
         setDecideScreen("swipe");
       } else if (data.status === "matched") {
@@ -218,7 +217,7 @@ function App() {
         setDecideScreen("room");
       }
     });
-  
+
     setRoomUnsubscribe(() => unsubscribe);
   }
 
@@ -273,6 +272,7 @@ function App() {
       await joinRoom(cleanCode, cleanName);
 
       setRoomCode(cleanCode);
+      setJoinCode(cleanCode);
       setIsHost(false);
 
       listenToRoom(cleanCode);
@@ -453,14 +453,15 @@ function App() {
           />
         );
       }
-    }
-    if (decideScreen === "matched") {
-      return (
-        <MatchedRestaurantScreen
-          roomData={roomData}
-          goBack={resetDecideFlow}
-        />
-      );
+
+      if (decideScreen === "matched") {
+        return (
+          <MatchedRestaurantScreen
+            roomData={roomData}
+            goBack={resetDecideFlow}
+          />
+        );
+      }
     }
 
     if (activeTab === "dating") {
@@ -524,16 +525,16 @@ function App() {
             matchCount={matchCount}
             onOpenMatches={() => setCurrentScreen("matches")}
             onOpenMessages={() => setCurrentScreen("messages")}
-             goBack={() => {
-
+            goBack={() => {
               if (currentScreen === "chat") {
-                 
-                  setCurrentScreen("messages");
-              } else if (currentScreen === "messages" || currentScreen === "matches") {
-                  
-                  setCurrentScreen("main");
+                setCurrentScreen("messages");
+              } else if (
+                currentScreen === "messages" ||
+                currentScreen === "matches"
+              ) {
+                setCurrentScreen("main");
               }
-          }}
+            }}
             screen={currentScreen}
           />
         }
