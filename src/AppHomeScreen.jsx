@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { signInUser, signUpUser } from "./firestore";
+import logo from "./assets/logo.png";
 
 function AppHomeScreen({ onAuthSuccess }) {
   const [isSignUp, setIsSignUp] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
-  const [hovered, setHovered] = useState(null); 
+  const [hovered, setHovered] = useState(null);
 
   const inputStyle = {
     width: "100%",
@@ -79,19 +80,19 @@ function AppHomeScreen({ onAuthSuccess }) {
       >
 
         <div
-                    style={{
-                        position: "absolute",
-                        top: "12px",
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        width: "120px",
-                        height: "28px",
-                        backgroundColor: "black",
-                        borderRadius: "20px",
-                        zIndex: 10,
-                    }}
-                />
-                
+          style={{
+            position: "absolute",
+            top: "12px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "120px",
+            height: "28px",
+            backgroundColor: "black",
+            borderRadius: "20px",
+            zIndex: 10,
+          }}
+        />
+
         <h1
           style={{
             fontSize: "48px",
@@ -128,7 +129,7 @@ function AppHomeScreen({ onAuthSuccess }) {
           }}
         >
           <img
-            src="src/assets/logo.png"
+            src={logo}
             alt="Logo"
             style={{
               paddingTop: "20px",
